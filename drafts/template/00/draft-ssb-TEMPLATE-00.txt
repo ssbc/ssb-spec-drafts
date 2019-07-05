@@ -1,0 +1,168 @@
+
+
+
+
+Secure Scuttlebutt Working Group                            Ch. Tschudin
+SSB-Draft                                            University of Basel
+Intended status: Informational                             July 04, 2019
+Expires: January 5, 2020
+
+
+                        TEMPLATE for SSB drafts
+                         draft-ssb-TEMPLATE-00
+
+Abstract
+
+   This is a placeholder.  There is a little bit of useful text in the
+   introductory section.
+
+Status of This Memo
+
+   SSB-Drafts are working documents of the Secure Scuttlebutt community.
+   Note that other groups may also distribute working documents as SSB-
+   Drafts.
+
+   SSB-Drafts are draft documents valid for a maximum of six months and
+   may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use SSB-Drafts as reference material or
+   to cite them other than as "work in progress."
+
+   This SSB-Draft will expire on January 5, 2020.
+
+Copyright Notice
+
+   Copyright (c) 2019 SSB Council and the persons identified as the
+   document authors.  All rights reserved.
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   1
+     1.1.  This is a demo subsection . . . . . . . . . . . . . . . .   2
+   2.  Informative References  . . . . . . . . . . . . . . . . . . .   2
+   Appendix A.  Historical Note  . . . . . . . . . . . . . . . . . .   2
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   2
+
+1.  Introduction
+
+   When copying this template you should modify the following items:
+
+   o  in the config section of the markdown file:
+
+      *  title
+
+
+
+Tschudin                 Expires January 5, 2020                [Page 1]
+
+SSB-Draft                    DRAFT TEMPLATE                    July 2019
+
+
+      *  abbreviation (running header)
+
+      *  docname (shown under the title)
+
+   o  in the author section of the markdown file:
+
+      *  author names and addresses
+
+   o  the middle section of the markdown file:
+
+      *  add your content, of course.
+
+   o  in the Makefile:
+
+      *  define the draft's file name
+
+1.1.  This is a demo subsection
+
+   This section has a ASCII art figure which has an internal reference
+   name as well as a title.  Note the empty line between the text and
+   the figure:
+
+                           +-not--------------+
+                           |    much          |
+                           |        to        |
+                           |          see     |
+                           |             here |
+                           `------------------'
+
+                           Figure 1: SSB Layers
+
+2.  Informative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+Appendix A.  Historical Note
+
+   This MAY [RFC2119] be useful. (you must be online the first time you
+   run the document rendering - afterwards, this reference is cached)
+
+Author's Address
+
+
+
+
+
+
+
+Tschudin                 Expires January 5, 2020                [Page 2]
+
+SSB-Draft                    DRAFT TEMPLATE                    July 2019
+
+
+   Christian Tschudin
+   University of Basel
+
+   Email: ssb(@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tschudin                 Expires January 5, 2020                [Page 3]

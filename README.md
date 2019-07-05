@@ -2,7 +2,7 @@
 
 A collection of protocol specifications for
 [Secure Scuttlebutt](https://www.scuttlebutt.nz/), see the [drafts](drafts)
-directory for an index (GitHub view), or in [html format](https://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/index.html).
+directory for an index.
 
 ## Note well
 

@@ -1,0 +1,596 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>SAME-AS - Creating the Illusion of Multi-Feed Identities</title>
+
+  <style type="text/css" title="Xml2Rfc (sans serif)">
+  /*<![CDATA[*/
+	  a {
+	  text-decoration: none;
+	  }
+      /* info code from SantaKlauss at http://www.madaboutstyle.com/tooltip2.html */
+      a.info {
+          /* This is the key. */
+          position: relative;
+          z-index: 24;
+          text-decoration: none;
+      }
+      a.info:hover {
+          z-index: 25;
+          color: #FFF; background-color: #900;
+      }
+      a.info span { display: none; }
+      a.info:hover span.info {
+          /* The span will display just on :hover state. */
+          display: block;
+          position: absolute;
+          font-size: smaller;
+          top: 2em; left: -5em; width: 15em;
+          padding: 2px; border: 1px solid #333;
+          color: #900; background-color: #EEE;
+          text-align: left;
+      }
+	  a.smpl {
+	  color: black;
+	  }
+	  a:hover {
+	  text-decoration: underline;
+	  }
+	  a:active {
+	  text-decoration: underline;
+	  }
+	  address {
+	  margin-top: 1em;
+	  margin-left: 2em;
+	  font-style: normal;
+	  }
+	  body {
+	  color: black;
+	  font-family: verdana, helvetica, arial, sans-serif;
+	  font-size: 10pt;
+	  max-width: 55em;
+	  
+	  }
+	  cite {
+	  font-style: normal;
+	  }
+	  dd {
+	  margin-right: 2em;
+	  }
+	  dl {
+	  margin-left: 2em;
+	  }
+	
+	  ul.empty {
+	  list-style-type: none;
+	  }
+	  ul.empty li {
+	  margin-top: .5em;
+	  }
+	  dl p {
+	  margin-left: 0em;
+	  }
+	  dt {
+	  margin-top: .5em;
+	  }
+	  h1 {
+	  font-size: 14pt;
+	  line-height: 21pt;
+	  page-break-after: avoid;
+	  }
+	  h1.np {
+	  page-break-before: always;
+	  }
+	  h1 a {
+	  color: #333333;
+	  }
+	  h2 {
+	  font-size: 12pt;
+	  line-height: 15pt;
+	  page-break-after: avoid;
+	  }
+	  h3, h4, h5, h6 {
+	  font-size: 10pt;
+	  page-break-after: avoid;
+	  }
+	  h2 a, h3 a, h4 a, h5 a, h6 a {
+	  color: black;
+	  }
+	  img {
+	  margin-left: 3em;
+	  }
+	  li {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol p {
+	  margin-left: 0em;
+	  }
+	  p {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  pre {
+	  margin-left: 3em;
+	  background-color: lightyellow;
+	  padding: .25em;
+	  }
+	  pre.text2 {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f0f0f0;
+	  width: 69em;
+	  }
+	  pre.inline {
+	  background-color: white;
+	  padding: 0em;
+	  }
+	  pre.text {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  width: 69em;
+	  }
+	  pre.drawing {
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  padding: 2em;
+	  }
+	  table {
+	  margin-left: 2em;
+	  }
+	  table.tt {
+	  vertical-align: top;
+	  }
+	  table.full {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.headers {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.tt td {
+	  vertical-align: top;
+	  }
+	  table.full td {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.tt th {
+	  vertical-align: top;
+	  }
+	  table.full th {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.headers th {
+	  border-style: none none inset none;
+	  border-width: 1px;
+	  }
+	  table.left {
+	  margin-right: auto;
+	  }
+	  table.right {
+	  margin-left: auto;
+	  }
+	  table.center {
+	  margin-left: auto;
+	  margin-right: auto;
+	  }
+	  caption {
+	  caption-side: bottom;
+	  font-weight: bold;
+	  font-size: 9pt;
+	  margin-top: .5em;
+	  }
+	
+	  table.header {
+	  border-spacing: 1px;
+	  width: 95%;
+	  font-size: 10pt;
+	  color: white;
+	  }
+	  td.top {
+	  vertical-align: top;
+	  }
+	  td.topnowrap {
+	  vertical-align: top;
+	  white-space: nowrap; 
+	  }
+	  table.header td {
+	  background-color: gray;
+	  width: 50%;
+	  }
+	  table.header a {
+	  color: white;
+	  }
+	  td.reference {
+	  vertical-align: top;
+	  white-space: nowrap;
+	  padding-right: 1em;
+	  }
+	  thead {
+	  display:table-header-group;
+	  }
+	  ul.toc, ul.toc ul {
+	  list-style: none;
+	  margin-left: 1.5em;
+	  margin-right: 0em;
+	  padding-left: 0em;
+	  }
+	  ul.toc li {
+	  line-height: 150%;
+	  font-weight: bold;
+	  font-size: 10pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  ul.toc li li {
+	  line-height: normal;
+	  font-weight: normal;
+	  font-size: 9pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  li.excluded {
+	  font-size: 0pt;
+	  }
+	  ul p {
+	  margin-left: 0em;
+	  }
+	
+	  .comment {
+	  background-color: yellow;
+	  }
+	  .center {
+	  text-align: center;
+	  }
+	  .error {
+	  color: red;
+	  font-style: italic;
+	  font-weight: bold;
+	  }
+	  .figure {
+	  font-weight: bold;
+	  text-align: center;
+	  font-size: 9pt;
+	  }
+	  .filename {
+	  color: #333333;
+	  font-weight: bold;
+	  font-size: 12pt;
+	  line-height: 21pt;
+	  text-align: center;
+	  }
+	  .fn {
+	  font-weight: bold;
+	  }
+	  .hidden {
+	  display: none;
+	  }
+	  .left {
+	  text-align: left;
+	  }
+	  .right {
+	  text-align: right;
+	  }
+	  .title {
+	  color: #990000;
+	  font-size: 18pt;
+	  line-height: 18pt;
+	  font-weight: bold;
+	  text-align: center;
+	  margin-top: 36pt;
+	  }
+	  .vcardline {
+	  display: block;
+	  }
+	  .warning {
+	  font-size: 14pt;
+	  background-color: yellow;
+	  }
+	
+	
+	  @media print {
+	  .noprint {
+		display: none;
+	  }
+	
+	  a {
+		color: black;
+		text-decoration: none;
+	  }
+	
+	  table.header {
+		width: 90%;
+	  }
+	
+	  td.header {
+		width: 50%;
+		color: black;
+		background-color: white;
+		vertical-align: top;
+		font-size: 12pt;
+	  }
+	
+	  ul.toc a::after {
+		content: leader('.') target-counter(attr(href), page);
+	  }
+	
+	  ul.ind li li a {
+		content: target-counter(attr(href), page);
+	  }
+	
+	  .print2col {
+		column-count: 2;
+		-moz-column-count: 2;
+		column-fill: auto;
+	  }
+	  }
+	
+	  @page {
+	  @top-left {
+		   content: "Internet-Draft"; 
+	  } 
+	  @top-right {
+		   content: "December 2010"; 
+	  } 
+	  @top-center {
+		   content: "Abbreviated Title";
+	  } 
+	  @bottom-left {
+		   content: "Doe"; 
+	  } 
+	  @bottom-center {
+		   content: "Expires June 2011"; 
+	  } 
+	  @bottom-right {
+		   content: "[Page " counter(page) "]"; 
+	  } 
+	  }
+	
+	  @page:first { 
+		@top-left {
+		  content: normal;
+		}
+		@top-right {
+		  content: normal;
+		}
+		@top-center {
+		  content: normal;
+		}
+	  }
+  /*]]>*/
+  </style>
+
+  <link href="#rfc.toc" rel="Contents">
+<link href="#rfc.section.1" rel="Chapter" title="1 ssb-same-as">
+<link href="#rfc.section.1.1" rel="Chapter" title="1.1 TODO">
+<link href="#rfc.section.1.2" rel="Chapter" title="1.2 Spec">
+<link href="#rfc.section.1.2.1" rel="Chapter" title="1.2.1 Assert that you are the same as another feed">
+<link href="#rfc.section.1.2.2" rel="Chapter" title="1.2.2 Block a sameAs">
+<link href="#rfc.section.1.2.3" rel="Chapter" title="1.2.3 Agree with another feed&#8217;s assertion">
+<link href="#rfc.section.1.2.4" rel="Chapter" title="1.2.4 Logic behind sameAs resolution">
+<link href="#rfc.section.1.3" rel="Chapter" title="1.3 Exposed API (as sbot plugin)">
+<link href="#rfc.section.1.3.1" rel="Chapter" title="1.3.1 sbot.sameAs.stream({live: false, sync: true, old: true}) source">
+<link href="#rfc.section.1.3.2" rel="Chapter" title="1.3.2 sbot.sameAs.get({id}, cb) async">
+<link href="#rfc.section.1.4" rel="Chapter" title="1.4 License">
+<link href="#rfc.authors" rel="Chapter">
+
+
+  <meta name="generator" content="xml2rfc version 2.22.3 - https://tools.ietf.org/tools/xml2rfc" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+
+  <meta name="dct.creator" content="McKegg, M." />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ssb-app-same-as-00" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-07-04" />
+  <meta name="dct.abstract" content="This is an unredacted copy of https://github.com/ssbc/ssb-same-as, taken July 4, 2019. The last commit of said repo is from Dec 13, 2017.SAME-AS is a scuttlebot plugin that provides a stream of which feeds are (and are not) the same as other feeds." />
+  <meta name="description" content="This is an unredacted copy of https://github.com/ssbc/ssb-same-as, taken July 4, 2019. The last commit of said repo is from Dec 13, 2017.SAME-AS is a scuttlebot plugin that provides a stream of which feeds are (and are not) the same as other feeds." />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+<td class="left">Secure Scuttlebutt Working Group</td>
+<td class="right">M. McKegg</td>
+</tr>
+<tr>
+<td class="left">SSB-Draft</td>
+<td class="right">New Zealand</td>
+</tr>
+<tr>
+<td class="left">Intended status: Informational</td>
+<td class="right">July 04, 2019</td>
+</tr>
+<tr>
+<td class="left">Expires: January 5, 2020</td>
+<td class="right"></td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">SAME-AS - Creating the Illusion of Multi-Feed Identities<br />
+  <span class="filename">draft-ssb-app-same-as-00</span></p>
+  
+  <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
+<p>This is an unredacted copy of https://github.com/ssbc/ssb-same-as, taken July 4, 2019. The last commit of said repo is from Dec 13, 2017.</p>
+<p>SAME-AS is a scuttlebot plugin that provides a stream of which feeds are (and are not) the same as other feeds.</p>
+<h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
+<p>SSB-Drafts are working documents of the Secure Scuttlebutt community.  Note that other groups may also distribute working documents as SSB-Drafts.</p>
+<p>SSB-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use SSB-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This SSB-Draft will expire on January 5, 2020.</p>
+<h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
+<p>Copyright (c) 2019 SSB Council and the persons identified as the document authors.  All rights reserved.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">ssb-same-as</a>
+</li>
+<ul><li>1.1.   <a href="#rfc.section.1.1">TODO</a>
+</li>
+<li>1.2.   <a href="#rfc.section.1.2">Spec</a>
+</li>
+<ul><li>1.2.1.   <a href="#rfc.section.1.2.1">Assert that you are the same as another feed</a>
+</li>
+<li>1.2.2.   <a href="#rfc.section.1.2.2">Block a sameAs</a>
+</li>
+<li>1.2.3.   <a href="#rfc.section.1.2.3">Agree with another feed&#8217;s assertion</a>
+</li>
+<li>1.2.4.   <a href="#rfc.section.1.2.4">Logic behind sameAs resolution</a>
+</li>
+</ul><li>1.3.   <a href="#rfc.section.1.3">Exposed API (as sbot plugin)</a>
+</li>
+<ul><li>1.3.1.   <a href="#rfc.section.1.3.1">sbot.sameAs.stream({live: false, sync: true, old: true}) source</a>
+</li>
+<li>1.3.2.   <a href="#rfc.section.1.3.2">sbot.sameAs.get({id}, cb) async</a>
+</li>
+</ul><li>1.4.   <a href="#rfc.section.1.4">License</a>
+</li>
+</ul><li><a href="#rfc.authors">Author's Address</a>
+</li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1">
+<a href="#rfc.section.1">1.</a> <a href="#ssb-same-as" id="ssb-same-as">ssb-same-as</a>
+</h1>
+<p id="rfc.section.1.p.1">A <a href="https://github.com/ssbc/scuttlebot">scuttlebot</a> plugin that provides a stream of which feeds are (and are not) the same as other feeds.</p>
+<p id="rfc.section.1.p.2">The basis for creating the illusion of multi-feed identities in SSB!</p>
+<p id="rfc.section.1.p.3">Based on <a href="https://github.com/ssbc/ssb-friends">ssb-friends</a> and <a href="https://github.com/ssbc/graphreduce">graphreduce</a></p>
+<h1 id="rfc.section.1.1">
+<a href="#rfc.section.1.1">1.1.</a> <a href="#todo" id="todo">TODO</a>
+</h1>
+<p></p>
+
+<ul>
+<li>need to test merge blocking and unmerging</li>
+<li>hook into replication to ensure the correct feeds are replicated</li>
+<li>improve realtime performance (avoid re-traversing entire graph)</li>
+</ul>
+<h1 id="rfc.section.1.2">
+<a href="#rfc.section.1.2">1.2.</a> <a href="#spec" id="spec">Spec</a>
+</h1>
+<h1 id="rfc.section.1.2.1">
+<a href="#rfc.section.1.2.1">1.2.1.</a> <a href="#assert-that-you-are-the-same-as-another-feed" id="assert-that-you-are-the-same-as-another-feed">Assert that you are the same as another feed</a>
+</h1>
+<pre>
+{
+  type: 'contact',
+  contact: TARGET_FEED_ID,
+  following: true, // for backwards compat reasons
+  sameAs: true
+}
+</pre>
+<h1 id="rfc.section.1.2.2">
+<a href="#rfc.section.1.2.2">1.2.2.</a> <a href="#block-a-sameas" id="block-a-sameas">Block a sameAs</a>
+</h1>
+<pre>
+{
+  type: 'contact',
+  contact: TARGET_FEED_ID,
+  following: true, // for backwards compat reasons
+  sameAs: false
+}
+</pre>
+<h1 id="rfc.section.1.2.3">
+<a href="#rfc.section.1.2.3">1.2.3.</a> <a href="#agree-with-another-feeds-assertion" id="agree-with-another-feeds-assertion">Agree with another feed&#8217;s assertion</a>
+</h1>
+<pre>
+{
+  type: 'contact',
+  contact: TARGET_FEED_ID,
+  following: true, // for backwards compat reasons
+  sameAs: {
+    SOURCE_FEED_ID: true // or `false` to remove an agreement
+  }
+}
+</pre>
+<h1 id="rfc.section.1.2.4">
+<a href="#rfc.section.1.2.4">1.2.4.</a> <a href="#logic-behind-sameas-resolution" id="logic-behind-sameas-resolution">Logic behind sameAs resolution</a>
+</h1>
+<p></p>
+
+<ul>
+<li>If one side explicitly disagrees (with a <samp>sameAs: false</samp>), the identities will <strong>NEVER be merged</strong>.</li>
+<li>If both sides agree, the identity will <strong>ALWAYS be merged</strong>.</li>
+<li>If one side agrees (and the other side has not shared an opinion), and you agree, then the identities will be <strong>merged</strong>.</li>
+<li>In all other cases, the identities <strong>will not be merged</strong>.</li>
+</ul>
+<p id="rfc.section.1.2.4.p.2">This module uses graphreduce to walk the <samp>sameAs</samp> links, so this means that any topology of links will be resolved.</p>
+<h1 id="rfc.section.1.3">
+<a href="#rfc.section.1.3">1.3.</a> <a href="#exposed-api-as-sbot-plugin" id="exposed-api-as-sbot-plugin">Exposed API (as sbot plugin)</a>
+</h1>
+<h1 id="rfc.section.1.3.1">
+<a href="#rfc.section.1.3.1">1.3.1.</a> <a href="#sbotsameasstreamlive-false-sync-true-old-true-source" id="sbotsameasstreamlive-false-sync-true-old-true-source">sbot.sameAs.stream({live: false, sync: true, old: true}) source</a>
+</h1>
+<p id="rfc.section.1.3.1.p.1">Gets a list of all of the resolved and verified <samp>sameAs</samp> links between feeds.</p>
+<pre>
+{from: 'a', to: 'b', value: true}
+{from: 'a', to: 'c', value: true}
+{from: 'a', to: 'd', value: true}
+{from: 'b', to: 'a', value: true}
+{from: 'b', to: 'c', value: true}
+{from: 'b', to: 'd', value: true}
+...
+</pre>
+<h1 id="rfc.section.1.3.2">
+<a href="#rfc.section.1.3.2">1.3.2.</a> <a href="#sbotsameasgetid-cb-async" id="sbotsameasgetid-cb-async">sbot.sameAs.get({id}, cb) async</a>
+</h1>
+<p id="rfc.section.1.3.2.p.1">Gets a list of all of the verified <samp>sameAs</samp> links for a given feed.</p>
+<pre>
+{
+  'b': true,
+  'c': true,
+  'd': true
+}
+</pre>
+<h1 id="rfc.section.1.4">
+<a href="#rfc.section.1.4">1.4.</a> <a href="#license" id="license">License</a>
+</h1>
+<p id="rfc.section.1.4.p.1">MIT</p>
+<h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Matt McKegg</span> 
+	  <span class="n hidden">
+		<span class="family-name">McKegg</span>
+	  </span>
+	</span>
+	<span class="org vcardline">New Zealand</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality"></span> 
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline"></span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:ssb(@FbGoHeEcePDG3Evemrc+hm+S77cXKf8BRQgkYinJggg=.ed25519)">ssb(@FbGoHeEcePDG3Evemrc+hm+S77cXKf8BRQgkYinJggg=.ed25519)</a></span>
+
+  </address>
+</div>
+
+</body>
+</html>

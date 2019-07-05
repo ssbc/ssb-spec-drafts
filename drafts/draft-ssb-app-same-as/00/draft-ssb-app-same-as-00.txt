@@ -1,0 +1,224 @@
+
+
+
+
+Secure Scuttlebutt Working Group                               M. McKegg
+SSB-Draft                                                    New Zealand
+Intended status: Informational                             July 04, 2019
+Expires: January 5, 2020
+
+
+        SAME-AS - Creating the Illusion of Multi-Feed Identities
+                        draft-ssb-app-same-as-00
+
+Abstract
+
+   This is an unredacted copy of https://github.com/ssbc/ssb-same-as,
+   taken July 4, 2019.  The last commit of said repo is from Dec 13,
+   2017.
+
+   SAME-AS is a scuttlebot plugin that provides a stream of which feeds
+   are (and are not) the same as other feeds.
+
+Status of This Memo
+
+   SSB-Drafts are working documents of the Secure Scuttlebutt community.
+   Note that other groups may also distribute working documents as SSB-
+   Drafts.
+
+   SSB-Drafts are draft documents valid for a maximum of six months and
+   may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use SSB-Drafts as reference material or
+   to cite them other than as "work in progress."
+
+   This SSB-Draft will expire on January 5, 2020.
+
+Copyright Notice
+
+   Copyright (c) 2019 SSB Council and the persons identified as the
+   document authors.  All rights reserved.
+
+
+Table of Contents
+
+   1.  ssb-same-as . . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  TODO  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.2.  Spec  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+       1.2.1.  Assert that you are the same as another feed  . . . .   2
+       1.2.2.  Block a sameAs  . . . . . . . . . . . . . . . . . . .   2
+       1.2.3.  Agree with another feed's assertion . . . . . . . . .   2
+       1.2.4.  Logic behind sameAs resolution  . . . . . . . . . . .   3
+     1.3.  Exposed API (as sbot plugin)  . . . . . . . . . . . . . .   3
+       1.3.1.  sbot.sameAs.stream({live: false, sync: true, old:
+
+
+
+McKegg                   Expires January 5, 2020                [Page 1]
+
+SSB-Draft                        SAME-AS                       July 2019
+
+
+               true}) source . . . . . . . . . . . . . . . . . . . .   3
+       1.3.2.  sbot.sameAs.get({id}, cb) async . . . . . . . . . . .   3
+     1.4.  License . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   4
+
+1.  ssb-same-as
+
+   A scuttlebot [1] plugin that provides a stream of which feeds are
+   (and are not) the same as other feeds.
+
+   The basis for creating the illusion of multi-feed identities in SSB!
+
+   Based on ssb-friends [2] and graphreduce [3]
+
+1.1.  TODO
+
+   o  need to test merge blocking and unmerging
+
+   o  hook into replication to ensure the correct feeds are replicated
+
+   o  improve realtime performance (avoid re-traversing entire graph)
+
+1.2.  Spec
+
+1.2.1.  Assert that you are the same as another feed
+
+   {
+     type: 'contact',
+     contact: TARGET_FEED_ID,
+     following: true, // for backwards compat reasons
+     sameAs: true
+   }
+
+1.2.2.  Block a sameAs
+
+   {
+     type: 'contact',
+     contact: TARGET_FEED_ID,
+     following: true, // for backwards compat reasons
+     sameAs: false
+   }
+
+1.2.3.  Agree with another feed's assertion
+
+
+
+
+
+
+
+McKegg                   Expires January 5, 2020                [Page 2]
+
+SSB-Draft                        SAME-AS                       July 2019
+
+
+   {
+     type: 'contact',
+     contact: TARGET_FEED_ID,
+     following: true, // for backwards compat reasons
+     sameAs: {
+       SOURCE_FEED_ID: true // or `false` to remove an agreement
+     }
+   }
+
+1.2.4.  Logic behind sameAs resolution
+
+   o  If one side explicitly disagrees (with a "sameAs: false"), the
+      identities will *NEVER be merged*.
+
+   o  If both sides agree, the identity will *ALWAYS be merged*.
+
+   o  If one side agrees (and the other side has not shared an opinion),
+      and you agree, then the identities will be *merged*.
+
+   o  In all other cases, the identities *will not be merged*.
+
+   This module uses graphreduce to walk the "sameAs" links, so this
+   means that any topology of links will be resolved.
+
+1.3.  Exposed API (as sbot plugin)
+
+1.3.1.  sbot.sameAs.stream({live: false, sync: true, old: true}) source
+
+   Gets a list of all of the resolved and verified "sameAs" links
+   between feeds.
+
+   {from: 'a', to: 'b', value: true}
+   {from: 'a', to: 'c', value: true}
+   {from: 'a', to: 'd', value: true}
+   {from: 'b', to: 'a', value: true}
+   {from: 'b', to: 'c', value: true}
+   {from: 'b', to: 'd', value: true}
+   ...
+
+1.3.2.  sbot.sameAs.get({id}, cb) async
+
+   Gets a list of all of the verified "sameAs" links for a given feed.
+
+   {
+     'b': true,
+     'c': true,
+     'd': true
+   }
+
+
+
+McKegg                   Expires January 5, 2020                [Page 3]
+
+SSB-Draft                        SAME-AS                       July 2019
+
+
+1.4.  License
+
+   MIT
+
+2.  References
+
+2.1.  URIs
+
+   [1] https://github.com/ssbc/scuttlebot
+
+   [2] https://github.com/ssbc/ssb-friends
+
+   [3] https://github.com/ssbc/graphreduce
+
+Author's Address
+
+   Matt McKegg
+   New Zealand
+
+   Email: ssb(@FbGoHeEcePDG3Evemrc+hm+S77cXKf8BRQgkYinJggg=.ed25519)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+McKegg                   Expires January 5, 2020                [Page 4]

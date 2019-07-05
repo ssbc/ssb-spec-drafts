@@ -28,8 +28,8 @@
 ## Misc
 
 - draft-ssb-template-00:
-  [html](https://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/template/00/draft-ssb-template-00.html),
-  [txt](template/00/draft-ssb-template-00.txt)
+  [html](https://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/template/00/draft-ssb-TEMPLATE-00.html
+  [txt](template/00/draft-ssb-TEMPLATE-00.txt)
 
 
 ---

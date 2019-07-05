@@ -3,8 +3,8 @@
 ## Application layer
 
 - draft-ssb-app-same-as-00:
-  [html](file://draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
-  [txt](draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
+[html](http://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/ drafts/draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html)
+  [txt](http://htmlpreview.github.com/?draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
 
 
 ---

@@ -3,7 +3,7 @@
 ## Application layer
 
 - draft-ssb-app-same-as-00:
-  [html](draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
+  [html](file://draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
   [txt](draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
 
 

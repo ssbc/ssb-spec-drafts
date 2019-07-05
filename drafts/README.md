@@ -3,7 +3,7 @@
 ## Application layer
 
 - draft-ssb-app-same-as-00:
-  [html](http://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
+  [html](https://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
   [txt](draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
 
 

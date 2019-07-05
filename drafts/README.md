@@ -4,7 +4,7 @@
 
 - draft-ssb-app-same-as-00:
   [html](http://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.html),
-  [txt](http://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
+  [txt](draft-ssb-app-same-as/00/draft-ssb-app-same-as-00.txt)
 
 
 ---

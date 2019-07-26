@@ -1,0 +1,747 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>GabbyGrove (CBOR based Feed Format)</title>
+
+  <style type="text/css" title="Xml2Rfc (sans serif)">
+  /*<![CDATA[*/
+	  a {
+	  text-decoration: none;
+	  }
+      /* info code from SantaKlauss at http://www.madaboutstyle.com/tooltip2.html */
+      a.info {
+          /* This is the key. */
+          position: relative;
+          z-index: 24;
+          text-decoration: none;
+      }
+      a.info:hover {
+          z-index: 25;
+          color: #FFF; background-color: #900;
+      }
+      a.info span { display: none; }
+      a.info:hover span.info {
+          /* The span will display just on :hover state. */
+          display: block;
+          position: absolute;
+          font-size: smaller;
+          top: 2em; left: -5em; width: 15em;
+          padding: 2px; border: 1px solid #333;
+          color: #900; background-color: #EEE;
+          text-align: left;
+      }
+	  a.smpl {
+	  color: black;
+	  }
+	  a:hover {
+	  text-decoration: underline;
+	  }
+	  a:active {
+	  text-decoration: underline;
+	  }
+	  address {
+	  margin-top: 1em;
+	  margin-left: 2em;
+	  font-style: normal;
+	  }
+	  body {
+	  color: black;
+	  font-family: verdana, helvetica, arial, sans-serif;
+	  font-size: 10pt;
+	  max-width: 55em;
+	  
+	  }
+	  cite {
+	  font-style: normal;
+	  }
+	  dd {
+	  margin-right: 2em;
+	  }
+	  dl {
+	  margin-left: 2em;
+	  }
+	
+	  ul.empty {
+	  list-style-type: none;
+	  }
+	  ul.empty li {
+	  margin-top: .5em;
+	  }
+	  dl p {
+	  margin-left: 0em;
+	  }
+	  dt {
+	  margin-top: .5em;
+	  }
+	  h1 {
+	  font-size: 14pt;
+	  line-height: 21pt;
+	  page-break-after: avoid;
+	  }
+	  h1.np {
+	  page-break-before: always;
+	  }
+	  h1 a {
+	  color: #333333;
+	  }
+	  h2 {
+	  font-size: 12pt;
+	  line-height: 15pt;
+	  page-break-after: avoid;
+	  }
+	  h3, h4, h5, h6 {
+	  font-size: 10pt;
+	  page-break-after: avoid;
+	  }
+	  h2 a, h3 a, h4 a, h5 a, h6 a {
+	  color: black;
+	  }
+	  img {
+	  margin-left: 3em;
+	  }
+	  li {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol p {
+	  margin-left: 0em;
+	  }
+	  p {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  pre {
+	  margin-left: 3em;
+	  background-color: lightyellow;
+	  padding: .25em;
+	  }
+	  pre.text2 {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f0f0f0;
+	  width: 69em;
+	  }
+	  pre.inline {
+	  background-color: white;
+	  padding: 0em;
+	  }
+	  pre.text {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  width: 69em;
+	  }
+	  pre.drawing {
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  padding: 2em;
+	  }
+	  table {
+	  margin-left: 2em;
+	  }
+	  table.tt {
+	  vertical-align: top;
+	  }
+	  table.full {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.headers {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.tt td {
+	  vertical-align: top;
+	  }
+	  table.full td {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.tt th {
+	  vertical-align: top;
+	  }
+	  table.full th {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.headers th {
+	  border-style: none none inset none;
+	  border-width: 1px;
+	  }
+	  table.left {
+	  margin-right: auto;
+	  }
+	  table.right {
+	  margin-left: auto;
+	  }
+	  table.center {
+	  margin-left: auto;
+	  margin-right: auto;
+	  }
+	  caption {
+	  caption-side: bottom;
+	  font-weight: bold;
+	  font-size: 9pt;
+	  margin-top: .5em;
+	  }
+	
+	  table.header {
+	  border-spacing: 1px;
+	  width: 95%;
+	  font-size: 10pt;
+	  color: white;
+	  }
+	  td.top {
+	  vertical-align: top;
+	  }
+	  td.topnowrap {
+	  vertical-align: top;
+	  white-space: nowrap; 
+	  }
+	  table.header td {
+	  background-color: gray;
+	  width: 50%;
+	  }
+	  table.header a {
+	  color: white;
+	  }
+	  td.reference {
+	  vertical-align: top;
+	  white-space: nowrap;
+	  padding-right: 1em;
+	  }
+	  thead {
+	  display:table-header-group;
+	  }
+	  ul.toc, ul.toc ul {
+	  list-style: none;
+	  margin-left: 1.5em;
+	  margin-right: 0em;
+	  padding-left: 0em;
+	  }
+	  ul.toc li {
+	  line-height: 150%;
+	  font-weight: bold;
+	  font-size: 10pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  ul.toc li li {
+	  line-height: normal;
+	  font-weight: normal;
+	  font-size: 9pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  li.excluded {
+	  font-size: 0pt;
+	  }
+	  ul p {
+	  margin-left: 0em;
+	  }
+	
+	  .comment {
+	  background-color: yellow;
+	  }
+	  .center {
+	  text-align: center;
+	  }
+	  .error {
+	  color: red;
+	  font-style: italic;
+	  font-weight: bold;
+	  }
+	  .figure {
+	  font-weight: bold;
+	  text-align: center;
+	  font-size: 9pt;
+	  }
+	  .filename {
+	  color: #333333;
+	  font-weight: bold;
+	  font-size: 12pt;
+	  line-height: 21pt;
+	  text-align: center;
+	  }
+	  .fn {
+	  font-weight: bold;
+	  }
+	  .hidden {
+	  display: none;
+	  }
+	  .left {
+	  text-align: left;
+	  }
+	  .right {
+	  text-align: right;
+	  }
+	  .title {
+	  color: #990000;
+	  font-size: 18pt;
+	  line-height: 18pt;
+	  font-weight: bold;
+	  text-align: center;
+	  margin-top: 36pt;
+	  }
+	  .vcardline {
+	  display: block;
+	  }
+	  .warning {
+	  font-size: 14pt;
+	  background-color: yellow;
+	  }
+	
+	
+	  @media print {
+	  .noprint {
+		display: none;
+	  }
+	
+	  a {
+		color: black;
+		text-decoration: none;
+	  }
+	
+	  table.header {
+		width: 90%;
+	  }
+	
+	  td.header {
+		width: 50%;
+		color: black;
+		background-color: white;
+		vertical-align: top;
+		font-size: 12pt;
+	  }
+	
+	  ul.toc a::after {
+		content: leader('.') target-counter(attr(href), page);
+	  }
+	
+	  ul.ind li li a {
+		content: target-counter(attr(href), page);
+	  }
+	
+	  .print2col {
+		column-count: 2;
+		-moz-column-count: 2;
+		column-fill: auto;
+	  }
+	  }
+	
+	  @page {
+	  @top-left {
+		   content: "Internet-Draft"; 
+	  } 
+	  @top-right {
+		   content: "December 2010"; 
+	  } 
+	  @top-center {
+		   content: "Abbreviated Title";
+	  } 
+	  @bottom-left {
+		   content: "Doe"; 
+	  } 
+	  @bottom-center {
+		   content: "Expires June 2011"; 
+	  } 
+	  @bottom-right {
+		   content: "[Page " counter(page) "]"; 
+	  } 
+	  }
+	
+	  @page:first { 
+		@top-left {
+		  content: normal;
+		}
+		@top-right {
+		  content: normal;
+		}
+		@top-center {
+		  content: normal;
+		}
+	  }
+  /*]]>*/
+  </style>
+
+  <link href="#rfc.toc" rel="Contents">
+<link href="#rfc.section.1" rel="Chapter" title="1 Gabby Grove">
+<link href="#rfc.section.2" rel="Chapter" title="2 old proposal">
+<link href="#rfc.section.2.1" rel="Chapter" title="2.1 incrementing on a broken format">
+<link href="#rfc.section.2.2" rel="Chapter" title="2.2 The use of muxprc specific features for transmission/replication">
+<link href="#rfc.section.3" rel="Chapter" title="3 Rational">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Keeping the timestamp on the message">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Having the author on the message">
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Only encoding the content">
+<link href="#rfc.section.4" rel="Chapter" title="4 Definitions">
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 CBOR basics">
+<link href="#rfc.section.5" rel="Chapter" title="5 Hash/PubKey References">
+<link href="#rfc.section.6" rel="Chapter" title="6 Code">
+<link href="#rfc.section.7" rel="Chapter" title="7 Further comments">
+<link href="#rfc.section.7.1" rel="Chapter" title="7.1 alternative encodings">
+<link href="#rfc.section.7.2" rel="Chapter" title="7.2 Deletion requests">
+<link href="#rfc.section.7.3" rel="Chapter" title="7.3 Size benefits">
+<link href="#rfc.section.7.4" rel="Chapter" title="7.4 I&#8217;m not sure how long lived this will be">
+<link href="#rfc.section.8" rel="Chapter" title="8 Adressed comments">
+<link href="#rfc.section.8.1" rel="Chapter" title="8.1 Event">
+<link href="#rfc.section.8.2" rel="Chapter" title="8.2 Content Type">
+<link href="#rfc.section.8.3" rel="Chapter" title="8.3 Deterministic encoding">
+<link href="#rfc.section.8.4" rel="Chapter" title="8.4 cbor">
+<link href="#rfc.references" rel="Chapter" title="9 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Historical Note">
+<link href="#rfc.authors" rel="Chapter">
+
+
+  <meta name="generator" content="xml2rfc version 2.9.8 - https://tools.ietf.org/tools/xml2rfc" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+
+  <meta name="dct.creator" content="Bubert, H." />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ssb-core-gabbygrove-00" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-07-26" />
+  <meta name="dct.abstract" content="This document defines a new binary format for SSBs append-only feeds.  It strives to" />
+  <meta name="description" content="This document defines a new binary format for SSBs append-only feeds.  It strives to" />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+<td class="left">Secure Scuttlebutt Working Group</td>
+<td class="right">H. Bubert</td>
+</tr>
+<tr>
+<td class="left">Internet-Draft</td>
+<td class="right">SSBC</td>
+</tr>
+<tr>
+<td class="left">Intended status: Informational</td>
+<td class="right">July 26, 2019</td>
+</tr>
+<tr>
+<td class="left">Expires: January 27, 2020</td>
+<td class="right"></td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">GabbyGrove (CBOR based Feed Format)<br />
+  <span class="filename">draft-ssb-core-gabbygrove-00</span></p>
+  
+  <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
+<p>This document defines a new binary format for SSBs append-only feeds.  It strives to</p>
+<p>It uses CBOR to encode the logical values that describe each entry</p>
+<h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
+<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
+<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
+<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This Internet-Draft will expire on January 27, 2020.</p>
+<h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
+<p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">Gabby Grove</a>
+</li>
+<li>2.   <a href="#rfc.section.2">old proposal</a>
+</li>
+<ul><li>2.1.   <a href="#rfc.section.2.1">incrementing on a broken format</a>
+</li>
+<li>2.2.   <a href="#rfc.section.2.2">The use of muxprc specific features for transmission/replication</a>
+</li>
+</ul><li>3.   <a href="#rfc.section.3">Rational</a>
+</li>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Keeping the timestamp on the message</a>
+</li>
+<li>3.2.   <a href="#rfc.section.3.2">Having the author on the message</a>
+</li>
+<li>3.3.   <a href="#rfc.section.3.3">Only encoding the content</a>
+</li>
+</ul><li>4.   <a href="#rfc.section.4">Definitions</a>
+</li>
+<ul><li>4.1.   <a href="#rfc.section.4.1">CBOR basics</a>
+</li>
+</ul><li>5.   <a href="#rfc.section.5">Hash/PubKey References</a>
+</li>
+<li>6.   <a href="#rfc.section.6">Code</a>
+</li>
+<li>7.   <a href="#rfc.section.7">Further comments</a>
+</li>
+<ul><li>7.1.   <a href="#rfc.section.7.1">alternative encodings</a>
+</li>
+<li>7.2.   <a href="#rfc.section.7.2">Deletion requests</a>
+</li>
+<li>7.3.   <a href="#rfc.section.7.3">Size benefits</a>
+</li>
+<li>7.4.   <a href="#rfc.section.7.4">I&#8217;m not sure how long lived this will be</a>
+</li>
+</ul><li>8.   <a href="#rfc.section.8">Adressed comments</a>
+</li>
+<ul><li>8.1.   <a href="#rfc.section.8.1">Event</a>
+</li>
+<li>8.2.   <a href="#rfc.section.8.2">Content Type</a>
+</li>
+<li>8.3.   <a href="#rfc.section.8.3">Deterministic encoding</a>
+</li>
+<li>8.4.   <a href="#rfc.section.8.4">cbor</a>
+</li>
+</ul><li>9.   <a href="#rfc.references">Informative References</a>
+</li>
+<li>Appendix A.   <a href="#rfc.appendix.A">Historical Note</a>
+</li>
+<li><a href="#rfc.authors">Author's Address</a>
+</li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1">
+<a href="#rfc.section.1">1.</a> <a href="#gabby-grove" id="gabby-grove">Gabby Grove</a>
+</h1>
+<p id="rfc.section.1.p.1">This is the revised version of ssb(%3ATKLKIHdM+beamr1dqoO2Jd6BC7oW5zj0ygLvmDsEc=.sha256). The main difference to <em>ProtoChain</em> is that <em>Gabby Grove</em> uses CBOR instead of ProtoBuf.</p>
+<p id="rfc.section.1.p.2">It&#8217;s extensability through type tags seems usefull, especially down the line <em>if</em> we ever change away from JSON as the content encoding. With it, we can explicitly mark cipherlinks as such.</p>
+<p id="rfc.section.1.p.3">My first concern The overhead of it&#8217;s self-describing encoding of <em>structs as maps</em> can be overcome by encoding them as arrays.</p>
+<h1 id="rfc.section.2">
+<a href="#rfc.section.2">2.</a> <a href="#old-proposal" id="old-proposal">old proposal</a>
+</h1>
+<p id="rfc.section.2.p.1">alternative approaches, essentially coming up with a new verification scheme based on a binary protocol.</p>
+<p></p>
+
+<ol>
+<li>Easy to implement (hence the use of <a href="https://cbor.io">CBOR</a> <a href="#RFC7049" class="xref">[RFC7049]</a>)</li>
+<li>Content is only referenced by hash on the immutable data structure (hence enabling omitting and dropping of content locally)</li>
+</ol>
+<p id="rfc.section.2.p.3">I propose the <samp>.ggfeed-v1</samp> suffix as a default feed reference.</p>
+<p id="rfc.section.2.p.4">Further comments this proposal addresses:</p>
+<h1 id="rfc.section.2.1">
+<a href="#rfc.section.2.1">2.1.</a> <a href="#incrementing-on-a-broken-format" id="incrementing-on-a-broken-format">incrementing on a broken format</a>
+</h1>
+<p id="rfc.section.2.1.p.1">The main idea of the first proposal was to add offchain-content without overhauling the verification scheme.  We got numerous comments on this, the gist being that we tried to hard, improving something that should be deprecated altogether.</p>
+<p id="rfc.section.2.1.p.2">Therefore we chose a clean slate approach with a new encoding scheme. This comes with the downside of requiring multiple supported <em>feed formats</em> in the stack. Personally I think this is good though as it will pave the way for other formats, like bamboo, as well.</p>
+<h1 id="rfc.section.2.2">
+<a href="#rfc.section.2.2">2.2.</a> <a href="#the-use-of-muxprc-specific-features-for-transmissionreplication" id="the-use-of-muxprc-specific-features-for-transmissionreplication">The use of muxprc specific features for transmission/replication</a>
+</h1>
+<p id="rfc.section.2.2.p.1">The idea to transmit content and metadata as two muxrpc frames was my idea. It seems sensible/practical because it fitted into the existing stack but I see now that it tried to much to fit into the existing way and hid a dependency along the way.</p>
+<p id="rfc.section.2.2.p.2">This is why we have the <samp>transfer</samp> message definition which has two fields. One for the message, which should be required and one field for the content, which can be omitted.</p>
+<h1 id="rfc.section.3">
+<a href="#rfc.section.3">3.</a> <a href="#rational" id="rational">Rational</a>
+</h1>
+<p id="rfc.section.3.p.1">While this is would introduce radical new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding offchain capabilities. Let me elaborate on two of them which cater to this point specifically:</p>
+<h1 id="rfc.section.3.1">
+<a href="#rfc.section.3.1">3.1.</a> <a href="#keeping-the-timestamp-on-the-message" id="keeping-the-timestamp-on-the-message">Keeping the timestamp on the message</a>
+</h1>
+<p id="rfc.section.3.1.p.1">In principle, the timestamp is an application concern. Some message types could omit it and it could ne considered <em>cleaner</em> to move them up into the content of the types that want/need them. We recognize however that it would stir up problems for existing applications and this is something we are not interested in.</p>
+<h1 id="rfc.section.3.2">
+<a href="#rfc.section.3.2">3.2.</a> <a href="#having-the-author-on-the-message" id="having-the-author-on-the-message">Having the author on the message</a>
+</h1>
+<p id="rfc.section.3.2.p.1">A similar argument could be made for the author of a message. In the current design the author never changes over the lifetime of a feed, so why have it on each and every message? Especially if you replicate one feed at a time it seems wasteful, since the author is already known.</p>
+<p id="rfc.section.3.2.p.2">@dominic made a pretty good security argument <a href="%1AsqTRxdVrbfypC69W7uWbMClQteNNnnl3ohzbpu3Xw=.sha256">here</a>. It should always be known which key-pair created a signature and thus having it reduces ambiguity and possible backdoors.</p>
+<h1 id="rfc.section.3.3">
+<a href="#rfc.section.3.3">3.3.</a> <a href="#only-encoding-the-content" id="only-encoding-the-content">Only encoding the content</a>
+</h1>
+<p id="rfc.section.3.3.p.1">This format would only encode the metadata as CBOR, leaving the <em>user</em> to encode their content as they see fit.  Since we don&#8217;t want to cause problems for applications, we suggest keeping the <samp>content</samp> portion in JSON.  This should allow for messages to be mapped full JSON objects which look just like regular messages so that they can be consumed by applications without any change.</p>
+<p id="rfc.section.3.3.p.2">For upgrades and more advance uses we added a <samp>encoding enum</samp> that only defines JSON up until now.</p>
+<h1 id="rfc.section.4">
+<a href="#rfc.section.4">4.</a> <a href="#definitions" id="definitions">Definitions</a>
+</h1>
+<h1 id="rfc.section.4.1">
+<a href="#rfc.section.4.1">4.1.</a> <a href="#cbor-basics" id="cbor-basics">CBOR basics</a>
+</h1>
+<p id="rfc.section.4.1.p.1">If you never worked with CBOR, I suggest checking out it&#8217;s <a href="https://cbor.io">website</a> and the definitions in <a href="#RFC7049" class="xref">[RFC7049]</a>). Similar to JSON it is a <em>self describing</em> format. Which means, bytes of it can be translated to logical, typed values without the need for a schema definition.</p>
+<p id="rfc.section.4.1.p.2">What helped me a lot as well to understand it better was <a href="https://cbor.me">the playground at cbor.me</a>. Here you can translate between the bytes in hexadecimal notation and the diagnostic noation (defined in section 6 of it&#8217;s RFC). Entering a key-value object on the left like this:</p>
+<pre>
+{
+  "type": "test",
+  "count": 123,
+  "true": false
+}
+</pre>
+<p id="rfc.section.4.1.p.3">And it outputs an indented and commented version with type annotations, like this:</p>
+<pre>
+A3               # map(3)
+   64            # text(4)
+      74797065   # "type"
+   64            # text(4)
+      74657374   # "test"
+   65            # text(5)
+      636F756E74 # "count"
+   18 7B         # unsigned(123)
+   64            # text(4)
+      74727565   # "true"
+   F4            # primitive(20)
+</pre>
+<p id="rfc.section.4.1.p.4">The comments tell us <em>this is a map with 3 entries</em>. Maps are key-value pairs, so we get three tuples of first the name (or key) of the pair and then the value. Notice that the keys are also typed (<em>text of len N</em>).</p>
+<p id="rfc.section.4.1.p.5">One writes <samp>message</samp> definitions which describe the type and ordering of each field.</p>
+<p id="rfc.section.4.1.p.6">For the metadata of a message it looks like this:</p>
+<pre>
+message Meta {
+  bytes previous   = 1;
+  bytes author     = 2;
+  uint64 sequence  = 3;
+  Content content  = 4;
+  uint64 timestamp = 5;
+}
+
+message Content {
+    ContentType type = 1;
+    uint64 size = 2;
+    bytes hash = 3;
+}
+
+enum ContentType {
+    Missing = 0;
+    JSON = 1;
+    // CBOR = 2; ???
+}
+</pre>
+<p id="rfc.section.4.1.p.7">Field one and two are arbitrary byte arrays, named <samp>previous</samp> and <samp>author</samp>.  Field number three is the sequence number of the message. (Protobuf uses variable size integers which grow in bytes as needed.) Field number four embeds another structure inside of <samp>Meta</samp>, the <samp>content</samp> which in turn is defined as the three fields <samp>type</samp>, <samp>size</samp> and <samp>hash</samp>.  The <samp>ContentType</samp> is an enumeration of possible values for a field, making sure the protocol agrees on a set of known values.</p>
+<p id="rfc.section.4.1.p.8">With such a definition file at hand, protobuf toolchains can generate code that does the marshalling to and from bytes for you.  That is also where it&#8217;s job ends, though. What constitutes a valid hash or public key is up to the implementor of this new feed type.</p>
+<p id="rfc.section.4.1.p.9">The next needed message structure would be <samp>message</samp> which is the meta with the corresponding signature:</p>
+<pre>
+message Message {
+    Meta meta = 1;
+    bytes signature = 2;
+}
+</pre>
+<p id="rfc.section.4.1.p.10">To validate a message, the receiver re-encodes just the <samp>meta</samp> fields to bytes and passes it and the signature to the cryptographic function that does the validation.</p>
+<p id="rfc.section.4.1.p.11">Lastly, there is a <samp>transfer</samp> message structure that has a <samp>Message</samp> and a byte array for the actual <samp>content</samp>:</p>
+<pre>
+message Transfer {
+    Message Message = 1;
+    bytes content = 2;
+}
+</pre>
+<h1 id="rfc.section.5">
+<a href="#rfc.section.5">5.</a> <a href="#hashpubkey-references" id="hashpubkey-references">Hash/PubKey References</a>
+</h1>
+<p id="rfc.section.5.p.1">The hashes and public key references are not base64 encoded readable strings but binary encoded.</p>
+<p id="rfc.section.5.p.2">We don&#8217;t plan to support many formats, which is why I decided against something like IPFS Multihash, which supports every hash under the sun. Again, this is not important because we don&#8217;t encode the <samp>content</samp> with this, just the metadata.</p>
+<p id="rfc.section.5.p.3">Currently there are only three different reference types:</p>
+<p></p>
+
+<ul>
+<li>
+<samp>0x01</samp>: ED25519 Public Key, 32bytes of data</li>
+<li>
+<samp>0x02</samp>: <samp>Previous</samp> message hash, using SHA256 (32bytes of data)</li>
+<li>
+<samp>0x03</samp>: <samp>Content.Hash</samp> also using SHA256 (32bytes of data)</li>
+</ul>
+<p id="rfc.section.5.p.5">We add one byte as prefix to those bytes, making all references 33bytes long.</p>
+<h1 id="rfc.section.6">
+<a href="#rfc.section.6">6.</a> <a href="#code" id="code">Code</a>
+</h1>
+<p id="rfc.section.6.p.1">the current work-in-progress repository can be found <a href="http://cryptbox.mindeco.de/ssb/gabbygrove">here</a>.</p>
+<p id="rfc.section.6.p.2">It experiments with Go and javascript interoperability and shows that signature verification and content hashing works as expected.</p>
+<p id="rfc.section.6.p.3">Integration into go-ssb or the javascript stack is pending on review comments.</p>
+<p id="rfc.section.6.p.4">One open question would be how to get this into EBT while also supporting the classical/legacy way of encoding messages.  For classical replication I&#8217;d suggest a new rpc stream command, similar to <samp>createHistoryStream</samp> which sends <samp>transfer</samp> encoded messages one by one.</p>
+<h1 id="rfc.section.7">
+<a href="#rfc.section.7">7.</a> <a href="#further-comments" id="further-comments">Further comments</a>
+</h1>
+<p id="rfc.section.7.p.1">First, I&#8217;m not heartpressed on the name at all. And if this isn&#8217;t already obvious, this would become the feed format that verse uses.</p>
+<h1 id="rfc.section.7.1">
+<a href="#rfc.section.7.1">7.1.</a> <a href="#alternative-encodings" id="alternative-encodings">alternative encodings</a>
+</h1>
+<p id="rfc.section.7.1.p.1">I&#8217;m undecided on protocol buffers, it just seemed to be the most stable (or boring if you like).</p>
+<p id="rfc.section.7.1.p.2">Possible interesting alternatives:</p>
+<p></p>
+
+<ul>
+<li>captnproto (seemed like a bit bleeding edge)</li>
+<li>msgpack (could work, seems niche)</li>
+<li>protobuf (pretty steap dependency, generated code)</li>
+</ul>
+<h1 id="rfc.section.7.2">
+<a href="#rfc.section.7.2">7.2.</a> <a href="#deletion-requests" id="deletion-requests">Deletion requests</a>
+</h1>
+<p id="rfc.section.7.2.p.1">I believe we should leave this out of the spec and just give way for clients to drop content as wanted. Tuning replication rules with signed deletions or what ever can be done orthogonal if the chain/feed format allows validation with missing content.</p>
+<h1 id="rfc.section.7.3">
+<a href="#rfc.section.7.3">7.3.</a> <a href="#size-benefits" id="size-benefits">Size benefits</a>
+</h1>
+<p id="rfc.section.7.3.p.1">This cuts down the amount of transmitted bytes considerably. As an example, a <em>old</em> contact message clocks in at roughly 434 bytes (JSON without whitespace, sequence in the hundreds range). Encoding a contact message with this, results in 289 bytes, 119 of which are still JSON. This overhead is small for longer posts but still wanted to mention it. The main driver of this reduction is the binary encoding of the references and being able to omit the field names. Converting content to a binary encoding would reduce it further but as stated above would require strict schemas for every type.</p>
+<h1 id="rfc.section.7.4">
+<a href="#rfc.section.7.4">7.4.</a> <a href="#im-not-sure-how-long-lived-this-will-be" id="im-not-sure-how-long-lived-this-will-be">I&#8217;m not sure how long lived this will be</a>
+</h1>
+<p id="rfc.section.7.4.p.1">I <em>think</em> this is a solid format but wouldn&#8217;t mind to be superseded by something else once it surfaces. As a migration path, I&#8217;d suggest we double down on <samp>SameAs</samp>.</p>
+<h1 id="rfc.section.8">
+<a href="#rfc.section.8">8.</a> <a href="#adressed-comments" id="adressed-comments">Adressed comments</a>
+</h1>
+<h1 id="rfc.section.8.1">
+<a href="#rfc.section.8.1">8.1.</a> <a href="#event" id="event">Event</a>
+</h1>
+<p><em>Message</em> and <em>Meta</em> were not easy to speak and reason about. <em>What includes what?</em>, etc.</p>
+<p id="rfc.section.8.1.p.2">Also <samp>Message</samp> was redundant to begin with. The Hash of a signed event is the SHA256 of <samp>event</samp> and <samp>signature</samp> bytes concataneted.</p>
+<p id="rfc.section.8.1.p.3">TODO: cfts msg</p>
+<h1 id="rfc.section.8.2">
+<a href="#rfc.section.8.2">8.2.</a> <a href="#content-type" id="content-type">Content Type</a>
+</h1>
+<p id="rfc.section.8.2.p.1">was totally the wrong name. Should be encoding.  Type is already ambigous because of application content.type like about and contact</p>
+<h1 id="rfc.section.8.3">
+<a href="#rfc.section.8.3">8.3.</a> <a href="#deterministic-encoding" id="deterministic-encoding">Deterministic encoding</a>
+</h1>
+<p id="rfc.section.8.3.p.1">TODO: how sending the signed bytes instead of remarshaling makes it extensible.</p>
+<h1 id="rfc.section.8.4">
+<a href="#rfc.section.8.4">8.4.</a> <a href="#cbor" id="cbor">cbor</a>
+</h1>
+<p id="rfc.section.8.4.p.1">but using arrays, maps are exsessive for the well defined structure</p>
+<h1 id="rfc.references">
+<a href="#rfc.references">9.</a> Informative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="RFC2119">[RFC2119]</b></td>
+<td class="top">
+<a>Bradner, S.</a>, "<a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7049">[RFC7049]</b></td>
+<td class="top">
+<a>Bormann, C.</a> and <a>P. Hoffman</a>, "<a href="https://tools.ietf.org/html/rfc7049">Concise Binary Object Representation (CBOR)</a>", RFC 7049, DOI 10.17487/RFC7049, October 2013.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#historical-note" id="historical-note">Historical Note</a>
+</h1>
+<p id="rfc.section.A.p.1">This MAY <a href="#RFC2119" class="xref">[RFC2119]</a> be useful. (you must be online the first time you run the document rendering - afterwards, this reference is cached)</p>
+<h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Henry Florenz Bubert</span> 
+	  <span class="n hidden">
+		<span class="family-name">Bubert</span>
+	  </span>
+	</span>
+	<span class="org vcardline">SSBC</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality"></span> 
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline"></span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:ssb(my%20pubkey)">ssb(my pubkey)</a></span>
+
+  </address>
+</div>
+
+</body>
+</html>

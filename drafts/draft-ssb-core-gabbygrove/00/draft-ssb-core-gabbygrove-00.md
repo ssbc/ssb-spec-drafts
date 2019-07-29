@@ -18,38 +18,26 @@ author:
   -
     ins: H. Bubert
     name: Henry Florenz Bubert
-    org: SSBC
-    email: ssb(my pubkey)
+    org: ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519
+    email: cryptix@riseup.net
 
 --- abstract
 
-This document defines a new binary format for SSBs append-only feeds.
-It strives to 
-
-It uses CBOR to encode the logical values that describe each entry
+This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.
+That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.
+It strives to do two things: be easier to implement then the current scheme. Hence, it uses [CBOR](https://cbor.io) {{?RFC7049}} to encode the logical values that describe each entry.
+Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed.
 
 --- middle
 
 # Gabby Grove
 
-This is the revised version of ssb(%3ATKLKIHdM+beamr1dqoO2Jd6BC7oW5zj0ygLvmDsEc=.sha256). The main difference to _ProtoChain_ is that _Gabby Grove_ uses CBOR instead of ProtoBuf.
+This is the revised version of [the initial ProtoChain proposal](%3ATKLKIHdM+beamr1dqoO2Jd6BC7oW5zj0ygLvmDsEc=.sha256).
+The main difference to _ProtoChain_ is that _Gabby Grove_ uses CBOR instead of Protocol Buffers.
 
-It's extensability through type tags seems usefull, especially down the line _if_ we ever change away from JSON as the content encoding. With it, we can explicitly mark cipherlinks as such.
+I propose the `ggfeed-v1` suffix as a default feed reference and `ggmsg-v1` for messages.
 
-My first concern 
-The overhead of it's self-describing encoding of _structs as maps_ can be overcome by encoding them as arrays.
-
-# old proposal
-
-alternative approaches, essentially coming up with a new verification scheme based on a binary protocol.
-
-
-1. Easy to implement (hence the use of [CBOR](https://cbor.io) {{?RFC7049}})
-2. Content is only referenced by hash on the immutable data structure (hence enabling omitting and dropping of content locally) 
-
-I propose the `.ggfeed-v1` suffix as a default feed reference.
-
-Further comments this proposal addresses:
+Remarks this proposal addresses over [the first Off-chain content proposal](%LrMcs9tqgOMLPGv6mN5Z7YYxRQ8qn0JRhVi++OyOvQo=.sha256):
 
 ## incrementing on a broken format
 
@@ -64,7 +52,7 @@ The idea to transmit content and metadata as two muxrpc frames was my idea. It s
 
 This is why we have the `transfer` message definition which has two fields. One for the message, which should be required and one field for the content, which can be omitted.
 
-# Rational
+# Rationale
 
 While this is would introduce radical new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding offchain capabilities. Let me elaborate on two of them which cater to this point specifically:
 
@@ -84,29 +72,86 @@ This format would only encode the metadata as CBOR, leaving the _user_ to encode
 Since we don't want to cause problems for applications, we suggest keeping the `content` portion in JSON.
 This should allow for messages to be mapped full JSON objects which look just like regular messages so that they can be consumed by applications without any change.
 
-For upgrades and more advance uses we added a `encoding enum` that only defines JSON up until now.
+For upgrades and more advance uses we added an `encoding enum` that defines known values for arbitrary data (`0`), JSON (`1`) and CBOR (`2`).
+CBOR _should_ be good at converting it's values to JSON for integration and backwards compatability.
 
-# Definitions
+# Definitions for SSB
 
+## Event
 
-## CBOR basics
+A single entry on an feed with this format is called an event (formerly also known as Message).
+It contains a fixed number of fields:
+
+* A cipherlink to the `previous` one, null only on the first message.
+* The ed25519 public key of the `author`, also encoded as a cipherlink.
+* The `sequence` number of the entry as an unsigned integer. Increasing by 1 each entry, starting with 1.
+* An unsigned integer describing a `timestamp`. Like in node/javascript, unix epoch timestamp but in milliseconds.
+* `content`: a group of three fields:
+  * `hash` as a cipherlink
+  * `size` as a uint16, increasing the maximum message size to 64k.
+  * `encoding` enumeration of three possible values.
+
+## Transfer
+
+The next needed message structure is `transfer`. It consists of three byte arrays:
+
+* The encoded bytes of an _Event_, here called `eventData`.
+* `signature`: 64 bytes, to be verified against the `author`s public key from the event.
+* the optional `content`: a maximum of 64k bytes.
+
+To validate a message, the receiver just takes the `eventData` and the `signature` and passes them to the cryptographic function that does the validation.
+In this case, edwards25519 as defined in {{?RFC8032}}, also known as Ed25519 from [Networking and Cryptography library (NaCL)](https://nacl.cr.yp.to/).
+
+If present, hashing the `content` needs to compute the same the as the `content.hash` field on the event.
+If it should be ommited, it needs to be set to null (primitive 22 or `0xf6` in CBOR) to keep the array it's contained in of length three.
+
+The Hash of a signed event (and the `previous` field of the next event) is the blak2b-256 of `eventData` and `signature` bytes concataneted.
+
+## Cipherlinks
+
+The hashes and public key references are not base64 encoded readable ASCII strings but are binary encoded.
+
+In this first version we don't plan to support many formats, which is why I decided against something like IPFS Multihash, which supports every hash function under the sun.
+
+Currently there are these different reference types:
+
+* `0x01`: references to gabby grove formatted feeds (ED25519 Public Key, 32bytes of data)
+* `0x02`: gabby grove signed event hashes (such as `previous`), using blake2b-256 (32bytes of data)
+* `0x03`: `content.hash` also using blake2b-256 (32bytes of data)
+* `0x04`: "SSB v1", legacy / old feed reference (ED25519 Public Key, 32bytes of data)
+* `0x05`: SHA256 message hashes as used by legacy ssb
+* `0x06`: SHA256 binary blob hashes as used by legacy ssb
+
+Only 1 to 3 are valid on gabby grove event fields.
+4 to 6 are intended to encode cipherlinks in CBOR encoded content when referencing feeds in the legacy format.
+I'm relativly certain and hopefull this will be revised and extended but it feels like a good starting point.
+They all should be convertable to and from the base64 encoded ASCII references we currently use in JSON.
+
+We add one byte as prefix to those bytes, making all references 33bytes long.
+
+# CBOR
+
+## Basics
 
 If you never worked with CBOR, I suggest checking out it's [website](https://cbor.io) and the definitions in {{?RFC7049}}). Similar to JSON it is a _self describing_ format. Which means, bytes of it can be translated to logical, typed values without the need for a schema definition.
 
-What helped me a lot as well to understand it better was [the playground at cbor.me](https://cbor.me). Here you can translate between the bytes in hexadecimal notation and the diagnostic noation (defined in section 6 of it's RFC). Entering a key-value object on the left like this:
+What helped me a lot as well to understand it better were the [cbor-diag utilities](https://github.com/cabo/cbor-diag) (or the [the playground at cbor.me](https://cbor.me) with the same features).
+With it, you can translate between bytes and the diagnostic noation (defined in section 6 of it's RFC).
+Roughly speaking you can use JSON like literals as diagnostic input for `diag2pretty.rb` (or the left side of the playground):
 
 ~~~~~~~~~~~
 {
   "type": "test",
   "count": 123,
-  "true": false
+  "true": false,
+  "link": null
 }
 ~~~~~~~~~~~
 
-And it outputs an indented and commented version with type annotations, like this:
+which outputs a hexadecimal, indented and commented representation with type annotations:
 
 ~~~~~~~~~~~
-A3               # map(3)
+A4               # map(4)
    64            # text(4)
       74797065   # "type"
    64            # text(4)
@@ -117,105 +162,99 @@ A3               # map(3)
    64            # text(4)
       74727565   # "true"
    F4            # primitive(20)
+   64            # text(4)
+      6C696E6B   # "link"
+   F6            # primitive(22)
 ~~~~~~~~~~~
 
-The comments tell us _this is a map with 3 entries_. Maps are key-value pairs, so we get three tuples of first the name (or key) of the pair and then the value. Notice that the keys are also typed (_text of len N_).
+The comments tell us the types and values again. The first line says _A4 means the following is a map with 3 entries_.
+Maps are key-value pairs, so we get three pairs of first the name (or key) of the pair and then the value.
+Next to signed and unsigned number types it also has predefined primitives for `true`, `false` and `null`.
+Notice that the keys are also typed (_text of len N_).
 
 Let's compare it to an array of the same values, without the keys:
 
 ~~~~~~~~~~~
-["test", 123, false]
+["test", 123, false, null]
 ~~~~~~~~~~~
 
 results in
 
 ~~~~~~~~~~~
-83             # array(3)
+84             # array(4)
    64          # text(4)
       74657374 # "test"
    18 7B       # unsigned(123)
    F4          # primitive(20)
+   F6          # primitive(22)
 ~~~~~~~~~~~
 
-This results in 9 encoded bytes. The map example needs 25, in comparison. Encoding well defined objects as maps comes with quite the overhead.
+This results in 10 encoded bytes. The map example needs 31, in comparison.
 
+Encoding the same well-defined objects as maps over and over again comes with a lot of overhead and redundant description of the field names.
 
-# TODO
+This was my main concern in comparisson to Protocol Buffers. A self-describing format isn't that usefull here since the fields don't change.
+As shown above, the size overhead of encoding structs as maps can be mitigated by encoding them as arrays instead.
 
-## Events
+## Canonical encoding
 
-One writes `message` definitions which describe the type and ordering of each field.
+We _could_ define the first field of a `transfer` as an _event_ itself instead of opagque bytes but I want to make canonical encoding on this level of the protocol optional.
+Meaning: if you can re-produce the same `eventData` from an de-coded stored `Event`, go ahead.
+Butt, diverging one bit from the original `eventData` means that signature verification and hash comparison will fail.
+Over all this seems like an potentially instable and divergent way of exchanging feeds, producing incorret references if implemetations incorrectly consume forked heads as actual messages.
 
+However, as an experiment, implementers are advised to use the canonical CBOR suggestions defined in [Section 3.9](https://tools.ietf.org/html/rfc7049#section-3.9).
+Since we only use bytes, integers and tags for our strucutres we can ignore the suggestions for map keys and floats.
 
+Potentially, a canonical encoding would allow for skipping certain fields on the transport layer.
+`author`, `sequence` and even `previous` could be filled in by the receiver themselvs to produce the full `eventData`.
 
-For the metadata of a message it looks like this:
+It would also free implementors on the question of how to store events.
+It's unclear to the author if this amounts to a worth-while endevor tompare to just storing the bytes of the `transfer`.
 
-~~~~~~~~~~~
-message Meta {
-  bytes previous   = 1;
-  bytes author     = 2;
-  uint64 sequence  = 3;
-  Content content  = 4;
-  uint64 timestamp = 5;
-}
+## Extensability
 
-message Content {
-    ContentType type = 1;
-    uint64 size = 2;
-    bytes hash = 3;
-}
+CBOR allows for augmenting the types of it's values with an additonal numeric tag. These are hints for the de- and encoders to treat some type of values differently.
 
-enum ContentType {
-    Missing = 0;
-    JSON = 1;
-    // CBOR = 2; ???
-}
-~~~~~~~~~~~
+This kind of extensability through type tags seems usefull for SSB, especially if we ever change away from JSON as the content encoding.
+With it, we can explicitly mark cipherlinks as such, for instance.
 
-Field one and two are arbitrary byte arrays, named `previous` and `author`.
-Field number three is the sequence number of the message. (Protobuf uses variable size integers which grow in bytes as needed.)
-Field number four embeds another structure inside of `Meta`, the `content` which in turn is defined as the three fields `type`, `size` and `hash`.
-The `ContentType` is an enumeration of possible values for a field, making sure the protocol agrees on a set of known values.
+Another option would be to explicitly tag the whole `transfer`, which is otherwise _just_ an array with three entries, and state how the signature was computed by the author's key-pair referenced inside the `event`.
 
-With such a definition file at hand, protobuf toolchains can generate code that does the marshalling to and from bytes for you.
-That is also where it's job ends, though. What constitutes a valid hash or public key is up to the implementor of this new feed type. 
+See [Section 2.4 of CBORs RFC](https://tools.ietf.org/html/rfc7049#section-2.4) for more.
 
-The next needed message structure would be `message` which is the meta with the corresponding signature:
+## CDDL
+
+Here is an exceprt of the format specfication in _Concise data definition language (CDDL)_ {{?RFC8610}} which describes the `event` and `content` objects. The full file is attached as Appendix A.
 
 ~~~~~~~~~~~
-message Message {
-    Meta meta = 1;
-    bytes signature = 2;
-}
+event = [
+  previous: cipherlink,
+  author: cipherlink,
+  sequence: uint,
+  timestamp: uint,
+  content,
+]
+
+content = [
+    hash: cipherlink,
+    size: uint16,
+    encoding: contentEncoding,
+]
+
+; 33 bytes, tagged with major type 6, number 1050
+cipherlink = #6.1050(bytes .size 33)
+
+; possible values for content encoding are 0, 1 and 2
+contentEncoding = 0..2
+
+; 16-bit unsigned int, equivalent to 0..65536
+uint16 = uint .size 2 
 ~~~~~~~~~~~
 
-To validate a message, the receiver re-encodes just the `meta` fields to bytes and passes it and the signature to the cryptographic function that does the validation.
+It allows for more detailed description and definition of valid objects and seems like an interesting tool to define supported types and messages for higher levels of SSB as well.
 
-Lastly, there is a `transfer` message structure that has a `Message` and a byte array for the actual `content`:
-
-~~~~~~~~~~~
-message Transfer {
-    Message Message = 1;
-    bytes content = 2;
-}
-~~~~~~~~~~~
-
-# Hash/PubKey References
-
-The hashes and public key references are not base64 encoded readable strings but binary encoded.
-
-We don't plan to support many formats, which is why I decided against something like IPFS Multihash, which supports every hash under the sun. Again, this is not important because we don't encode the `content` with this, just the metadata.
-
-Currently there are only three different reference types:
-
-* `0x01`: ED25519 Public Key, 32bytes of data
-* `0x02`: `Previous` message hash, using SHA256 (32bytes of data)
-* `0x03`: `Content.Hash` also using SHA256 (32bytes of data)
-
-We add one byte as prefix to those bytes, making all references 33bytes long.
-
-
-# Code
+# Code and roll out
 
 the current work-in-progress repository can be found [here](http://cryptbox.mindeco.de/ssb/gabbygrove).
 
@@ -226,19 +265,22 @@ Integration into go-ssb or the javascript stack is pending on review comments.
 One open question would be how to get this into EBT while also supporting the classical/legacy way of encoding messages.
 For classical replication I'd suggest a new rpc stream command, similar to `createHistoryStream` which sends `transfer` encoded messages one by one.
 
-# Further comments
+The upcoming verse app will use this format, possibly only with encoding content as json for now.
 
-First, I'm not heartpressed on the name at all. And if this isn't already obvious, this would become the feed format that verse uses.
+# Remarks
 
-## alternative encodings
+## Alternative Encodings
 
-I'm undecided on protocol buffers, it just seemed to be the most stable (or boring if you like).
+Having worked with CBOR and Protocol Buffers, CBOR feels like the better tool for the job.
+Especially since it could also be used for encoding of the `content` itself where Protocol Buffers would require shared schemas for all types.
 
-Possible interesting alternatives:
+Possible alternatives:
 
-* captnproto (seemed like a bit bleeding edge)
-* msgpack (could work, seems niche)
-* protobuf (pretty steap dependency, generated code)
+* Cap’n Proto: seemed like a bit bleeding edge.
+* MessgePack: my reading of Appendix E, it's quite stable but extension mechanism is in a dead end.
+* Protocol Buffers: pretty steap dependency, generated code, schema only interesting for event entries, not higher levels of the stack
+
+[Appendix E. (Comparison of Other Binary Formats to CBOR's Design Objectives)](https://tools.ietf.org/html/rfc7049#appendix-E) also shows how CBOR compares to ASN.1/DER/BER, BSON and UBJSON.
 
 ## Deletion requests
 
@@ -248,44 +290,93 @@ I believe we should leave this out of the spec and just give way for clients to 
 
 This cuts down the amount of transmitted bytes considerably. As an example, a _old_ contact message clocks in at roughly 434 bytes (JSON without whitespace, sequence in the hundreds range). Encoding a contact message with this, results in 289 bytes, 119 of which are still JSON. This overhead is small for longer posts but still wanted to mention it. The main driver of this reduction is the binary encoding of the references and being able to omit the field names. Converting content to a binary encoding would reduce it further but as stated above would require strict schemas for every type.
 
-## I'm not sure how long lived this will be
+## How long lived this will be?
 
-I _think_ this is a solid format but wouldn't mind to be superseded by something else once it surfaces. As a migration path, I'd suggest we double down on `SameAs`.
+I _think_ this is a solid format but wouldn't mind to be superseded by something else once it surfaces. As a migration path, I'd suggest we double down on `sameAs`.
+The _simplest_  case of it would be terminating one feed and starting a new one, while logically appending one to the other for higher levels of the protocol stack.
+The implications for indexing things like the friend graph and how to end feeds in the old format show that this needs to be coverted in a seperate spec.
 
+# Adressed comments from ProtoChain
 
-# Adressed comments
+Apart from chosing another library to CBOR for encoding the bytes this proposal changed the name of a couple of things.
 
 ## Event
 
-_Message_ and _Meta_ were not easy to speak and reason about. _What includes what?_, etc. 
+as [@cft](@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519) mentioned in [his first comment](%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256), _Message_ and _Meta_ were not easy to speak and reason about.
+"What includes what?" wasn't easy enough to answer. The _Message_ was conceptually redundant as well since it's fields can be in the _Transfer_ structure as well to achive the same results.
+Which is why there is just a single concept for this called _Event_.
 
-Also `Message` was redundant to begin with. The Hash of a signed event is the SHA256 of `event` and `signature` bytes concataneted.
+## "Content Type"
 
-TODO: cfts msg
+Was not only wrong because it is already a named concept on the higher level (type:contact, type:post, etc.) but also because it is not specific enough.
+This field deals with the _encoding_ of the content and thus should be named as such.
 
-## Content Type
+## Algorithmic choices
 
-was totally the wrong name. Should be encoding.
-Type is already ambigous because of application content.type like about and contact
-
-## Deterministic encoding
-
-TODO: how sending the signed bytes instead of remarshaling makes it extensible.
-
-## cbor
-
-but using arrays, maps are exsessive for the well defined structure
-
-
+It tries to be more explicit with it's cryptographic algorithms.
 
 --- back
 
-# Historical Note
+# CDDL Spec v1
 
-This MAY {{?RFC2119}} be useful. (you must be online the first time you
-run the document rendering - afterwards, this reference is cached)
+<!-- It would be handy to have a macro to embedd this from a sperate file, I think.
+Needs to be colwrapped to suppress warnings and overflowing the html format -->
+
+~~~~~~~~~~~
+; this document uses the Concise data definition language (CDDL)
+; https://tools.ietf.org/html/rfc8610
+
+; it describes the data strucutres that are used
+; by the gabby grove feed format for secure-scuttlebutt (ssb)
+; feeds are single author/writer and they don't fork.
+; the use of hash functions to address previous entries,
+; turns them into an append-only linked-list that can't be alterd.
+
+; a single entry on a feed (formerly also known as message)
+event = [
+  previous: cipherlink,
+  author: cipherlink,
+  sequence: uint,
+  timestamp: uint,
+  content,
+]
+
+content = [
+    hash: cipherlink,
+    size: uint16,
+    encoding: contentEncoding,
+]
+
+; 33 bytes, tagged with major type 6, number 1050
+; this is used to indicate the cryptographic references
+cipherlink = #6.1050(bytes .size 33)
+; See section 2.4 and iana registry for already defined tags
+; https://tools.ietf.org/html/rfc7049#section-2.4
+; https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags
+
+; possible values for content encoding are 0, 1 and 2
+; 0 means _arbitrary bytes_ (like an private message, image or tar)
+; 1 means json
+; 2 means cbor
+contentEncoding = 0..2
+
+; 16-bit unsigned int, equivalent to 0..65536
+uint16 = uint .size 2 
+
+; transfer describes a signed event with the actual content
+transfer = [
+  eventData: bytes,         ; event encoded as bytes
+  signature: signature,     ; the signature 
+  ? contentData: bytes,     ; the actual bytes of the content
+]
+
+; we _could_ define the first field of a transfer as an _event_
+; but I want to make canonical encoding on this level
+; only optional but not a requirement as output
+
+; v1 only support Ed25519 curves.
+; These signatures are always 64 bytes long.
+signature = bytes .size 64
+~~~~~~~~~~~
 
 
---- fluff
-
-what?

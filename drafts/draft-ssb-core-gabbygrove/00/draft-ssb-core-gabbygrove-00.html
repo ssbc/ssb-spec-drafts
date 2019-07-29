@@ -405,14 +405,14 @@
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.9.8 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.22.3 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Bubert, H." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ssb-core-gabbygrove-00" />
   <meta name="dct.issued" scheme="ISO8601" content="2019-07-29" />
-  <meta name="dct.abstract" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses " />
-  <meta name="description" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses " />
+  <meta name="dct.abstract" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed." />
+  <meta name="description" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed." />
 
 </head>
 
@@ -426,7 +426,7 @@
 <td class="right">H. Bubert</td>
 </tr>
 <tr>
-<td class="left">Internet-Draft</td>
+<td class="left">SSB-Draft</td>
 <td class="right">ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519</td>
 </tr>
 <tr>
@@ -448,13 +448,11 @@
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
 <p>This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, defining the bytes that are used for computing the cryptographic signatures and hashes that form a feed.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses <a href="https://cbor.io">CBOR</a> <a href="#RFC7049" class="xref">[RFC7049]</a> to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
-<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
-<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
-<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on January 30, 2020.</p>
+<p>SSB-Drafts are working documents of the Secure Scuttlebutt community.  Note that other groups may also distribute working documents as SSB-Drafts.</p>
+<p>SSB-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use SSB-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This SSB-Draft will expire on January 30, 2020.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
-<p>Copyright (c) 2019 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
-<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.</p>
+<p>Copyright (c) 2019 SSB Council and the persons identified as the document authors.  All rights reserved.</p>
 
   
   <hr class="noprint" />

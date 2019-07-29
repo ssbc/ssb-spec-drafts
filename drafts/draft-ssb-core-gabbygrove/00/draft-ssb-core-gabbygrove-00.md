@@ -8,7 +8,7 @@ abbrev: DRAFT GabbyGrove
 docname: draft-ssb-core-gabbygrove-00
 category: info
 submissionType: independent
-ipr: trust200902
+ipr: none
 wg: Secure Scuttlebutt Working Group
 
 stand_alone: yes

@@ -3,7 +3,7 @@
 
 
 Secure Scuttlebutt Working Group                               H. Bubert
-Internet-Draft ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519
+SSB-Draft      ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519
 Intended status: Informational                             July 29, 2019
 Expires: January 30, 2020
 
@@ -24,57 +24,48 @@ Abstract
 
 Status of This Memo
 
-   This Internet-Draft is submitted in full conformance with the
-   provisions of BCP 78 and BCP 79.
+   SSB-Drafts are working documents of the Secure Scuttlebutt community.
+   Note that other groups may also distribute working documents as SSB-
+   Drafts.
 
-   Internet-Drafts are working documents of the Internet Engineering
-   Task Force (IETF).  Note that other groups may also distribute
-   working documents as Internet-Drafts.  The list of current Internet-
-   Drafts is at https://datatracker.ietf.org/drafts/current/.
+   SSB-Drafts are draft documents valid for a maximum of six months and
+   may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use SSB-Drafts as reference material or
+   to cite them other than as "work in progress."
 
-   Internet-Drafts are draft documents valid for a maximum of six months
-   and may be updated, replaced, or obsoleted by other documents at any
-   time.  It is inappropriate to use Internet-Drafts as reference
-   material or to cite them other than as "work in progress."
-
-   This Internet-Draft will expire on January 30, 2020.
+   This SSB-Draft will expire on January 30, 2020.
 
 Copyright Notice
 
-   Copyright (c) 2019 IETF Trust and the persons identified as the
+   Copyright (c) 2019 SSB Council and the persons identified as the
    document authors.  All rights reserved.
-
-   This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents
-   (https://trustee.ietf.org/license-info) in effect on the date of
-   publication of this document.  Please review these documents
-   carefully, as they describe your rights and restrictions with respect
-   to this document.
-
-
-
-Bubert                  Expires January 30, 2020                [Page 1]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
 
 
 Table of Contents
 
    1.  Gabby Grove . . . . . . . . . . . . . . . . . . . . . . . . .   2
-     1.1.  incrementing on a broken format . . . . . . . . . . . . .   3
+     1.1.  incrementing on a broken format . . . . . . . . . . . . .   2
      1.2.  The use of muxprc specific features for
            transmission/replication  . . . . . . . . . . . . . . . .   3
    2.  Rationale . . . . . . . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Keeping the timestamp on the message  . . . . . . . . . .   3
      2.2.  Having the author on the message  . . . . . . . . . . . .   3
-     2.3.  Only encoding the content . . . . . . . . . . . . . . . .   4
+
+
+
+Bubert                  Expires January 30, 2020                [Page 1]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
+
+     2.3.  Only encoding the content . . . . . . . . . . . . . . . .   3
    3.  Definitions for SSB . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.2.  Transfer  . . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.2.  Transfer  . . . . . . . . . . . . . . . . . . . . . . . .   4
      3.3.  Cipherlinks . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  CBOR  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   6
      4.1.  Basics  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.2.  Canonical encoding  . . . . . . . . . . . . . . . . . . .   8
+     4.2.  Canonical encoding  . . . . . . . . . . . . . . . . . . .   7
      4.3.  Extensability . . . . . . . . . . . . . . . . . . . . . .   8
      4.4.  CDDL  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
    5.  Code and roll out . . . . . . . . . . . . . . . . . . . . . .   9
@@ -105,15 +96,6 @@ Table of Contents
    Remarks this proposal addresses over the first Off-chain content
    proposal [3]:
 
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 2]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
 1.1.  incrementing on a broken format
 
    The main idea of the first proposal was to add offchain-content
@@ -123,6 +105,15 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
    Therefore we chose a clean slate approach with a new encoding scheme.
    This comes with the downside of requiring multiple supported _feed
+
+
+
+
+Bubert                  Expires January 30, 2020                [Page 2]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
+
    formats_ in the stack.  Personally I think this is good though as it
    will pave the way for other formats, like bamboo, as well.
 
@@ -162,14 +153,6 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    replicate one feed at a time it seems wasteful, since the author is
    already known.
 
-
-
-
-Bubert                  Expires January 30, 2020                [Page 3]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
    @dominic made a pretty good security argument here [4].  It should
    always be known which key-pair created a signature and thus having it
    reduces ambiguity and possible backdoors.
@@ -179,6 +162,14 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    This format would only encode the metadata as CBOR, leaving the
    _user_ to encode their content as they see fit.  Since we don't want
    to cause problems for applications, we suggest keeping the "content"
+
+
+
+Bubert                  Expires January 30, 2020                [Page 3]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
+
    portion in JSON.  This should allow for messages to be mapped full
    JSON objects which look just like regular messages so that they can
    be consumed by applications without any change.
@@ -216,16 +207,6 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
       *  "encoding" enumeration of three possible values.
 
-
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 4]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
 3.2.  Transfer
 
    The next needed message structure is "transfer".  It consists of
@@ -237,6 +218,13 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
       key from the event.
 
    o  the optional "content": a maximum of 64k bytes.
+
+
+
+Bubert                  Expires January 30, 2020                [Page 4]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
 
    To validate a message, the receiver just takes the "eventData" and
    the "signature" and passes them to the cryptographic function that
@@ -275,13 +263,6 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    o  "0x04": "SSB v1", legacy / old feed reference (ED25519 Public Key,
       32bytes of data)
 
-
-
-Bubert                  Expires January 30, 2020                [Page 5]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
    o  "0x05": SHA256 message hashes as used by legacy ssb
 
    o  "0x06": SHA256 binary blob hashes as used by legacy ssb
@@ -292,6 +273,14 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    hopefull this will be revised and extended but it feels like a good
    starting point.  They all should be convertable to and from the
    base64 encoded ASCII references we currently use in JSON.
+
+
+
+
+Bubert                  Expires January 30, 2020                [Page 5]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
 
    We add one byte as prefix to those bytes, making all references
    33bytes long.
@@ -322,22 +311,6 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    which outputs a hexadecimal, indented and commented representation
    with type annotations:
 
-
-
-
-
-
-
-
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 6]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
    A4               # map(4)
       64            # text(4)
          74797065   # "type"
@@ -357,6 +330,14 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    _A4 means the following is a map with 3 entries_.  Maps are key-value
    pairs, so we get three pairs of first the name (or key) of the pair
    and then the value.  Next to signed and unsigned number types it also
+
+
+
+Bubert                  Expires January 30, 2020                [Page 6]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
+
    has predefined primitives for "true", "false" and "null".  Notice
    that the keys are also typed (_text of len N_).
 
@@ -385,15 +366,6 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
    change.  As shown above, the size overhead of encoding structs as
    maps can be mitigated by encoding them as arrays instead.
 
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 7]
-
-Internet-Draft              DRAFT GabbyGrove                   July 2019
-
-
 4.2.  Canonical encoding
 
    We _could_ define the first field of a "transfer" as an _event_
@@ -413,6 +385,15 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
    Potentially, a canonical encoding would allow for skipping certain
    fields on the transport layer.  "author", "sequence" and even
+
+
+
+
+Bubert                  Expires January 30, 2020                [Page 7]
+
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
+
+
    "previous" could be filled in by the receiver themselvs to produce
    the full "eventData".
 
@@ -445,9 +426,28 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Bubert                  Expires January 30, 2020                [Page 8]
 
-Internet-Draft              DRAFT GabbyGrove                   July 2019
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 
    event = [
@@ -503,7 +503,7 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
 Bubert                  Expires January 30, 2020                [Page 9]
 
-Internet-Draft              DRAFT GabbyGrove                   July 2019
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 
 6.  Remarks
@@ -559,7 +559,7 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
 Bubert                  Expires January 30, 2020               [Page 10]
 
-Internet-Draft              DRAFT GabbyGrove                   July 2019
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 
    appending one to the other for higher levels of the protocol stack.
@@ -615,7 +615,7 @@ Internet-Draft              DRAFT GabbyGrove                   July 2019
 
 Bubert                  Expires January 30, 2020               [Page 11]
 
-Internet-Draft              DRAFT GabbyGrove                   July 2019
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 
 8.2.  URIs
@@ -671,7 +671,7 @@ Appendix A.  CDDL Spec v1
 
 Bubert                  Expires January 30, 2020               [Page 12]
 
-Internet-Draft              DRAFT GabbyGrove                   July 2019
+SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 
    ]

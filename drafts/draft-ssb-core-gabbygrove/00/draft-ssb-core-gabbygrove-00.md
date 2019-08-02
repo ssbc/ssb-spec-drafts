@@ -52,7 +52,7 @@ Dominic made a pretty good security argument [here](ssb://%1AsqTRxdVrbfypC69W7uW
 ## Only encoding the content
 
 This format would only encode the metadata as CBOR, leaving the _user_ to encode their content as they see fit.
-Since we don't want to cause problems for applications, we suggest keeping the `content` portion in JSON.
+Since we don't want to cause problems for applications, we suggest keeping the `content` portion in JSON {{?RFC8259}}.
 This should allow for events to be mapped full JSON objects which look just like regular, legacy messages so that they can be consumed by applications without any change.
 
 For upgrades and more advance uses we added an `encoding enum` that defines known values for arbitrary data (`0`), JSON (`1`) and CBOR (`2`).
@@ -78,17 +78,17 @@ It contains a fixed number of fields:
 
 The next needed structure is `transfer`. It consists of three byte arrays:
 
-* The encoded bytes of an _Event_, here called `eventData`.
+* The encoded bytes of an _event_, here called `eventData`.
 * `signature`: 64 bytes, to be verified against the `author`s public key from the event.
 * the optional `content`: a maximum of 64k bytes.
 
-To validate an incoming signed event, the receiver just takes the `eventData` and the `signature` and passes them to the cryptographic function that does the validation.
+To validate the _event_, the receiver just takes the `eventData` and the `signature` and passes them to the cryptographic function that does the validation.
 In this case, edwards25519 as defined in {{?RFC8032}}, also known as Ed25519 from the [Networking and Cryptography library (NaCL)](https://nacl.cr.yp.to/).
 
-If present, hashing the `content` needs to compute the same hash as stated by the `content.hash` field on the event.
-If it should be omitted, it needs to be set to null (primitive 22 or `0xf6` in CBOR) to keep the array it's contained in of length three.
+If `content` is present, hashing it needs to compute the same hash as stated by the `content.hash` field on the event.
+To omit the `content`, it needs to be set to `null` (primitive 22 or `0xf6` in CBOR), so that the array the field is contained in has the same size in both cases.
 
-The Hash of a signed event (and the `previous` field of the next event) is the SHA256 of `eventData` and `signature` bytes concatenated.
+The hash of a signed event (and the `previous` field of the next event) is the SHA256 of `eventData` and `signature` bytes concatenated.
 
 ## Cipherlinks
 
@@ -114,7 +114,7 @@ We add one byte as prefix to those bytes, making all references 33bytes long, fo
 
 ### Cross references
 
-Up until now SSB only had to deal with `.ed25519` and `.sha256` to identify a whole feed and individual messages respectively. Although I'd like to avoid a registry of known suffixes, my [initial thoughts](ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256) on how to do _decent_ subjective name-spaces for identifier and networks are still very vague. For the meantime, I propose the `.ggfeed-v1` suffix as a default feed reference and `.ggmsg-v1` for messages.
+Up until now SSB only had to deal with `.ed25519` and `.sha256` to identify a whole feed and individual entries respectively. Although I'd like to avoid a registry of known suffixes, my [initial thoughts](ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256) on how to do _decent_ subjective name-spaces for identifier and networks are still very vague. For the meantime, I propose the `.ggfeed-v1` suffix as a default feed reference and `.ggmsg-v1` for messages.
 
 I also briefly looked into [IPFS Content Identifiers (CID)s](https://docs.ipfs.io/guides/concepts/cid/) and [Decentralized Identifiers (DIDs)](https://w3c-ccg.github.io/did-spec/) but discarded them since it leaves the scope of this specification. It's only important that we clearly discern and define type and data of these identifiers so that we can convert to and from them down the road.
 
@@ -283,8 +283,7 @@ Therefore we chose a clean slate approach with a new encoding scheme. This comes
 
 The idea to transmit content and metadata as two [MUXRPC](https://github.com/ssbc/muxrpc) frames was my idea. It seems sensible/practical because it fitted into the existing stack but I see now that it tried to much to fit into the existing way and hid a dependency along the way.
 
-This is why we have the `transfer` message definition which has two fields. One for the message, which should be required and one field for the content, which can be omitted.
-
+This is why the `transfer` structure definition has a dedicated field for `content` which can be set to `null` to indicate unavailability.
 
 --- back
 

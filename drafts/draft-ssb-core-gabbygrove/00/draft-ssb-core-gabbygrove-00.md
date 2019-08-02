@@ -37,7 +37,7 @@ The main difference to _ProtoChain_ is that _Gabby Grove_ uses CBOR instead of P
 
 # Rationale
 
-While this is would introduce radical new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding offchain capabilities. Let me elaborate on two of them which cater to this point specifically:
+While this is would introduce radical new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding off-chain capabilities. Let me elaborate on two of them which cater to this point specifically:
 
 ## Keeping the timestamp
 
@@ -56,7 +56,7 @@ Since we don't want to cause problems for applications, we suggest keeping the `
 This should allow for events to be mapped full JSON objects which look just like regular, legacy messages so that they can be consumed by applications without any change.
 
 For upgrades and more advance uses we added an `encoding enum` that defines known values for arbitrary data (`0`), JSON (`1`) and CBOR (`2`).
-CBOR _should_ be good at converting it's values to JSON for integration and backwards compatability to other parts of the SSB stack.
+CBOR _should_ be good at converting it's values to JSON for integration and backwards compatibility to other parts of the SSB stack.
 
 # Definitions for SSB
 
@@ -86,9 +86,9 @@ To validate an incoming signed event, the receiver just takes the `eventData` an
 In this case, edwards25519 as defined in {{?RFC8032}}, also known as Ed25519 from the [Networking and Cryptography library (NaCL)](https://nacl.cr.yp.to/).
 
 If present, hashing the `content` needs to compute the same hash as stated by the `content.hash` field on the event.
-If it should be ommited, it needs to be set to null (primitive 22 or `0xf6` in CBOR) to keep the array it's contained in of length three.
+If it should be omitted, it needs to be set to null (primitive 22 or `0xf6` in CBOR) to keep the array it's contained in of length three.
 
-The Hash of a signed event (and the `previous` field of the next event) is the SHA256 of `eventData` and `signature` bytes concataneted.
+The Hash of a signed event (and the `previous` field of the next event) is the SHA256 of `eventData` and `signature` bytes concatenated.
 
 ## Cipherlinks
 
@@ -107,16 +107,16 @@ Currently there are these different reference types:
 
 Only 1 to 3 are used on gabby grove event fields.
 4 to 6 are intended to encode cipherlinks in CBOR encoded content when referencing feeds in the legacy format.
-I'm relativly certain and hopefull this will be revised and extended but it feels like a good starting point.
-They all should be convertable to and from the base64 encoded ASCII references we currently use in JSON.
+I'm relatively certain and hopeful this will be revised and extended but it feels like a good starting point.
+They all should be convertible to and from the base64 encoded ASCII references we currently use in JSON.
 
 We add one byte as prefix to those bytes, making all references 33bytes long, for now.
 
 ### Cross references
 
-Up until now SSB only had to deal with `.ed25519` and `.sha256` to identify a whole feed and individual messages respectivly. Although I'd like to avoid a registry of known suffixes, my [initial thoughts](ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256) on how to do _decent_ subjective name-spaces for identifier and networks are still very vague. For the meantime, I propose the `.ggfeed-v1` suffix as a default feed reference and `.ggmsg-v1` for messages.
+Up until now SSB only had to deal with `.ed25519` and `.sha256` to identify a whole feed and individual messages respectively. Although I'd like to avoid a registry of known suffixes, my [initial thoughts](ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256) on how to do _decent_ subjective name-spaces for identifier and networks are still very vague. For the meantime, I propose the `.ggfeed-v1` suffix as a default feed reference and `.ggmsg-v1` for messages.
 
-I also briefly looked into [IPFS Content Identifiers (CID)s](https://docs.ipfs.io/guides/concepts/cid/) and [Decentralized Identifiers (DIDs)](https://w3c-ccg.github.io/did-spec/) but discarded them since it leaves the scope of this specification. It's only important that we clearly discerne and define type and data of these identifiers so that we can convert to and from them down the road.
+I also briefly looked into [IPFS Content Identifiers (CID)s](https://docs.ipfs.io/guides/concepts/cid/) and [Decentralized Identifiers (DIDs)](https://w3c-ccg.github.io/did-spec/) but discarded them since it leaves the scope of this specification. It's only important that we clearly discern and define type and data of these identifiers so that we can convert to and from them down the road.
 
 # CBOR
 
@@ -125,7 +125,7 @@ I also briefly looked into [IPFS Content Identifiers (CID)s](https://docs.ipfs.i
 If you never worked with CBOR, I suggest checking out it's [website](https://cbor.io) and the definitions in {{?RFC7049}}). Similar to JSON it is a _self describing_ format. Which means, bytes of it can be translated to logical, typed values without the need for a schema definition.
 
 What helped me a lot as well to understand it better were the [cbor-diag utilities](https://github.com/cabo/cbor-diag) (or the [the playground at cbor.me](https://cbor.me) with the same features).
-With it, you can translate between bytes and the diagnostic noation (defined in section 6 of it's RFC).
+With it, you can translate between bytes and the diagnostic notation (defined in section 6 of it's RFC).
 Roughly speaking you can use JSON like literals as diagnostic input for `diag2pretty.rb` (or the left side of the playground):
 
 ~~~~~~~~~~~
@@ -182,30 +182,30 @@ This results in 10 encoded bytes. The map example needs 31, in comparison.
 
 Encoding the same well-defined objects as maps over and over again comes with a lot of overhead and redundant description of the field names.
 
-This was my main concern in comparisson to Protocol Buffers. A self-describing format isn't that usefull here since the fields don't change.
-As shown above, the size overhead of encoding structs as maps can be mitigated by encoding them as arrays instead.
+This was my main concern in comparison to Protocol Buffers. A self-describing format isn't that useful here since the fields don't change.
+As shown above, the size overhead of encoding structures as maps can be mitigated by encoding them as arrays instead.
 
 ## Canonical encoding
 
-We _could_ define the first field of a `transfer` as an _event_ itself instead of opagque bytes but I want to make canonical encoding on this level of the protocol optional.
+We _could_ define the first field of a `transfer` as an _event_ itself instead of opaque bytes but I want to make canonical encoding on this level of the protocol optional.
 Meaning: if you can re-produce the same `eventData` from an de-coded stored `Event`, go ahead.
 Butt, diverging one bit from the original `eventData` means that signature verification and hash comparison will fail.
-Over all this seems like an potentially instable and divergent way of exchanging feeds, producing incorret references as heads of a feed if implemetations incorrectly consume them.
+Over all this seems like an potentially instable and divergent way of exchanging feeds, producing incorrect references as heads of a feed if implementations incorrectly consume them.
 
 However, as an experiment, implementers are advised to use the canonical CBOR suggestions defined in [Section 3.9](https://tools.ietf.org/html/rfc7049#section-3.9).
-Since we only use bytes, integers and tags for our strucutres we can ignore the suggestions for map keys and floats.
+Since we only use bytes, integers and tags for our structures we can ignore the suggestions for map keys and floats.
 
 Potentially, a canonical encoding would allow for skipping certain fields on the transport layer.
-`author`, `sequence` and even `previous` could be filled in by the receiver themselvs to produce the full `eventData`.
+`author`, `sequence` and even `previous` could be filled in by the receiver themselves to produce the full `eventData`.
 
 It would also free implementors on the question of how to store events.
-It's unclear to the author if this amounts to a worth-while endevor tompare to just storing the bytes of the `transfer`.
+It's unclear to the author if this amounts to a worth-while endeavor compared to just storing the bytes of the `transfer`.
 
-## Extensability
+## Extensibility
 
-CBOR allows for augmenting the types of it's values with an additonal numeric tag. These are hints for the de- and encoders to treat some type of values differently.
+CBOR allows for augmenting the types of it's values with an additional numeric tag. These are hints for the de- and encoders to treat some type of values differently.
 
-This kind of extensability through type tags seems usefull for SSB, especially if we ever change away from JSON as the content encoding.
+This kind of extensibility through type tags seems useful for SSB, especially if we ever change away from JSON as the content encoding.
 With it, we can explicitly mark cipherlinks as such, for instance.
 
 Another option would be to explicitly tag the whole `transfer`, which is otherwise _just_ an array with three entries, and state how the signature was computed by the author's key-pair referenced inside the `event`.
@@ -234,7 +234,7 @@ Possible alternatives:
 
 * Cap’n Proto: seemed like a bit bleeding edge.
 * MessgePack: my reading of Appendix E, it's quite stable but extension mechanism is in a dead end.
-* Protocol Buffers: pretty steap dependency, generated code, schema only interesting for event entries, not higher levels of the stack
+* Protocol Buffers: pretty steep dependency, generated code, schema only interesting for event entries, not higher levels of the stack
 
 [Appendix E. (Comparison of Other Binary Formats to CBOR's Design Objectives)](https://tools.ietf.org/html/rfc7049#appendix-E) also shows how CBOR compares to ASN.1/DER/BER, BSON and UBJSON.
 
@@ -250,16 +250,16 @@ This cuts down the amount of transmitted bytes considerably. As an example, a _o
 
 I _think_ this is a solid format but wouldn't mind to be superseded by something else once it surfaces. As a migration path, I'd suggest we double down on `sameAs`.
 The _simplest_  case of it would be terminating one feed and starting a new one, while logically appending one to the other for higher levels of the protocol stack.
-The implications for indexing things like the friend graph and how to end feeds in the old format show that this needs to be coverted in a seperate spec.
+The implications for indexing things like the friend graph and how to end feeds in the old format show that this needs to be covered in a separate spec.
 
-# Adressed comments from ProtoChain
+# Addressed comments from ProtoChain
 
-Apart from chosing another library to CBOR for encoding the bytes this proposal changed the name of a couple of things.
+Apart from choosing another library for marshalling bytes this proposal changed the name of a couple of things.
 
 ## Event
 
 as [@cft](@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519) mentioned in [his first comment](ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256), _Message_ and _Meta_ were not easy to speak and reason about.
-"What includes what?" wasn't easy enough to answer. The _Message_ was conceptually redundant as well since it's fields can be in the _Transfer_ structure as well to achive the same results.
+"What includes what?" wasn't easy enough to answer. The _Message_ was conceptually redundant as well since it's fields can be in the _Transfer_ structure as well to achieve the same results.
 Which is why there is just a single concept for this called _Event_.
 
 ## "Content Type"
@@ -274,14 +274,14 @@ Remarks this proposal addresses over [the first Off-chain content proposal](ssb:
 
 ## incrementing on a broken format
 
-The main idea of the first proposal was to add offchain-content without overhauling the verification scheme.
+The main idea of the first proposal was to add off-chain content without overhauling the verification scheme.
 We got numerous comments on this, the gist being that we tried to hard, improving something that should be deprecated altogether.
 
 Therefore we chose a clean slate approach with a new encoding scheme. This comes with the downside of requiring multiple supported _feed formats_ in the stack. Personally I think this is good though as it will pave the way for other formats, like bamboo, as well.
 
-## The use of muxprc specific features for transmission/replication
+## The use of MUXRPC specific features for transmission/replication
 
-The idea to transmit content and metadata as two muxrpc frames was my idea. It seems sensible/practical because it fitted into the existing stack but I see now that it tried to much to fit into the existing way and hid a dependency along the way.
+The idea to transmit content and metadata as two [MUXRPC](https://github.com/ssbc/muxrpc) frames was my idea. It seems sensible/practical because it fitted into the existing stack but I see now that it tried to much to fit into the existing way and hid a dependency along the way.
 
 This is why we have the `transfer` message definition which has two fields. One for the message, which should be required and one field for the content, which can be omitted.
 
@@ -290,24 +290,24 @@ This is why we have the `transfer` message definition which has two fields. One 
 
 ## CDDL
 
-As a suggestion for possible future work, here is the format specfication in _Concise data definition language (CDDL)_ {{?RFC8610}} which describes the `event`, `content` and `transfer` objects.
+As a suggestion for possible future work, here is the format specification in _Concise data definition language (CDDL)_ {{?RFC8610}} which describes the `event`, `content` and `transfer` objects.
 
 The language allows for more detailed description and definition of valid objects and seems like an interesting tool to define supported types and messages for higher levels of SSB as well.
 
 
 
-<!-- It would be handy to have a macro to embedd this from a sperate file, I think.
+<!-- It would be handy to have a macro to embed this from a separate file, I think.
 Needs to be colwrapped to suppress warnings and overflowing the html format -->
 
 ~~~~~~~~~~~
 ; this document uses the Concise data definition language (CDDL)
 ; https://tools.ietf.org/html/rfc8610
 
-; it describes the data strucutres that are used
+; it describes the data structures that are used
 ; by the gabby grove feed format for secure-scuttlebutt (ssb)
 ; feeds are single author/writer and they don't fork.
 ; the use of hash functions to address previous entries,
-; turns them into an append-only linked-list that can't be alterd.
+; turns them into an append-only linked-list that can't be altered.
 
 ; a single entry on a feed (formerly also known as message)
 event = [

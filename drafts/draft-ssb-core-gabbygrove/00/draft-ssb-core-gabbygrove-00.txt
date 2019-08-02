@@ -3,9 +3,9 @@
 
 
 Secure Scuttlebutt Working Group                               H. Bubert
-SSB-Draft      ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519
-Intended status: Informational                             July 29, 2019
-Expires: January 30, 2020
+SSB-Draft                                                           SSBC
+Intended status: Informational                           August 02, 2019
+Expires: February 3, 2020
 
 
                   GabbyGrove (CBOR based Feed Format)
@@ -14,13 +14,13 @@ Expires: January 30, 2020
 Abstract
 
    This document defines a new binary format for append-only feeds as
-   used by Secure-Scuttlebutt.  That is, defining the bytes that are
-   used for computing the cryptographic signatures and hashes that form
-   a feed.  It strives to do two things: be easier to implement then the
-   current scheme.  Hence, it uses CBOR [1] [RFC7049] to encode the
-   logical values that describe each entry.  Secondly, it only reference
-   content by hash on the feed entry to enable content deletion without
-   breaking verification of the feed.
+   used by Secure-Scuttlebutt.  That is, it defines the bytes that are
+   used for computing the cryptographic signatures and hashes that make
+   up a feed in this format.  It strives to do two things: be easier to
+   implement then the current scheme.  Hence, it uses CBOR [1] [RFC7049]
+   to encode the logical values that describe each entry.  Secondly, it
+   only reference content by hash on the feed entry to enable content
+   deletion without breaking verification of the feed.
 
 Status of This Memo
 
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use SSB-Drafts as reference material or
    to cite them other than as "work in progress."
 
-   This SSB-Draft will expire on January 30, 2020.
+   This SSB-Draft will expire on February 3, 2020.
 
 Copyright Notice
 
@@ -44,89 +44,52 @@ Copyright Notice
 Table of Contents
 
    1.  Gabby Grove . . . . . . . . . . . . . . . . . . . . . . . . .   2
-     1.1.  incrementing on a broken format . . . . . . . . . . . . .   2
-     1.2.  The use of muxprc specific features for
-           transmission/replication  . . . . . . . . . . . . . . . .   3
-   2.  Rationale . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  Keeping the timestamp on the message  . . . . . . . . . .   3
+   2.  Rationale . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+     2.1.  Keeping the timestamp . . . . . . . . . . . . . . . . . .   2
      2.2.  Having the author on the message  . . . . . . . . . . . .   3
-
-
-
-Bubert                  Expires January 30, 2020                [Page 1]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
      2.3.  Only encoding the content . . . . . . . . . . . . . . . .   3
-   3.  Definitions for SSB . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  Definitions for SSB . . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Bubert                  Expires February 3, 2020                [Page 1]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
      3.2.  Transfer  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.3.  Cipherlinks . . . . . . . . . . . . . . . . . . . . . . .   5
-   4.  CBOR  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.1.  Basics  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.3.  Cipherlinks . . . . . . . . . . . . . . . . . . . . . . .   4
+       3.3.1.  Cross references  . . . . . . . . . . . . . . . . . .   5
+   4.  CBOR  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+     4.1.  Basics  . . . . . . . . . . . . . . . . . . . . . . . . .   5
      4.2.  Canonical encoding  . . . . . . . . . . . . . . . . . . .   7
      4.3.  Extensability . . . . . . . . . . . . . . . . . . . . . .   8
-     4.4.  CDDL  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
-   5.  Code and roll out . . . . . . . . . . . . . . . . . . . . . .   9
-   6.  Remarks . . . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     6.1.  Alternative Encodings . . . . . . . . . . . . . . . . . .  10
-     6.2.  Deletion requests . . . . . . . . . . . . . . . . . . . .  10
-     6.3.  Size benefits . . . . . . . . . . . . . . . . . . . . . .  10
-     6.4.  How long lived this will be?  . . . . . . . . . . . . . .  10
-   7.  Adressed comments from ProtoChain . . . . . . . . . . . . . .  11
-     7.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .  11
-     7.2.  "Content Type"  . . . . . . . . . . . . . . . . . . . . .  11
-     7.3.  Algorithmic choices . . . . . . . . . . . . . . . . . . .  11
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
-     8.1.  Informative References  . . . . . . . . . . . . . . . . .  11
-     8.2.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   Appendix A.  CDDL Spec v1 . . . . . . . . . . . . . . . . . . . .  12
+   5.  Code and roll out . . . . . . . . . . . . . . . . . . . . . .   8
+   6.  Remarks . . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     6.1.  Alternative Encodings . . . . . . . . . . . . . . . . . .   8
+     6.2.  Deletion requests . . . . . . . . . . . . . . . . . . . .   9
+     6.3.  Size benefits . . . . . . . . . . . . . . . . . . . . . .   9
+     6.4.  How long lived this will be?  . . . . . . . . . . . . . .   9
+   7.  Adressed comments from ProtoChain . . . . . . . . . . . . . .   9
+     7.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     7.2.  "Content Type"  . . . . . . . . . . . . . . . . . . . . .  10
+   8.  Comments addressed since the first "off-chain content"
+       proposal  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  incrementing on a broken format . . . . . . . . . . . . .  10
+     8.2.  The use of muxprc specific features for
+           transmission/replication  . . . . . . . . . . . . . . . .  10
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     9.1.  Informative References  . . . . . . . . . . . . . . . . .  11
+     9.2.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
+   Appendix A.  CDDL . . . . . . . . . . . . . . . . . . . . . . . .  12
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Gabby Grove
 
-   This is the revised version of the initial ProtoChain proposal [2].
-   The main difference to _ProtoChain_ is that _Gabby Grove_ uses CBOR
-   instead of Protocol Buffers.
-
-   I propose the "ggfeed-v1" suffix as a default feed reference and
-   "ggmsg-v1" for messages.
-
-   Remarks this proposal addresses over the first Off-chain content
-   proposal [3]:
-
-1.1.  incrementing on a broken format
-
-   The main idea of the first proposal was to add offchain-content
-   without overhauling the verification scheme.  We got numerous
-   comments on this, the gist being that we tried to hard, improving
-   something that should be deprecated altogether.
-
-   Therefore we chose a clean slate approach with a new encoding scheme.
-   This comes with the downside of requiring multiple supported _feed
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 2]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
-   formats_ in the stack.  Personally I think this is good though as it
-   will pave the way for other formats, like bamboo, as well.
-
-1.2.  The use of muxprc specific features for transmission/replication
-
-   The idea to transmit content and metadata as two muxrpc frames was my
-   idea.  It seems sensible/practical because it fitted into the
-   existing stack but I see now that it tried to much to fit into the
-   existing way and hid a dependency along the way.
-
-   This is why we have the "transfer" message definition which has two
-   fields.  One for the message, which should be required and one field
-   for the content, which can be omitted.
+   This is the revised version of the ProtoChain proposal [2].  The main
+   difference to _ProtoChain_ is that _Gabby Grove_ uses CBOR instead of
+   Protocol Buffers.
 
 2.  Rationale
 
@@ -137,11 +100,20 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    adding offchain capabilities.  Let me elaborate on two of them which
    cater to this point specifically:
 
-2.1.  Keeping the timestamp on the message
+2.1.  Keeping the timestamp
 
    In principle, the timestamp is an application concern.  Some message
    types could omit it and it could ne considered _cleaner_ to move them
    up into the content of the types that want/need them.  We recognize
+
+
+
+
+Bubert                  Expires February 3, 2020                [Page 2]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
    however that it would stir up problems for existing applications and
    this is something we are not interested in.
 
@@ -153,7 +125,7 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    replicate one feed at a time it seems wasteful, since the author is
    already known.
 
-   @dominic made a pretty good security argument here [4].  It should
+   dominic made a pretty good security argument here [3].  It should
    always be known which key-pair created a signature and thus having it
    reduces ambiguity and possible backdoors.
 
@@ -162,14 +134,6 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    This format would only encode the metadata as CBOR, leaving the
    _user_ to encode their content as they see fit.  Since we don't want
    to cause problems for applications, we suggest keeping the "content"
-
-
-
-Bubert                  Expires January 30, 2020                [Page 3]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    portion in JSON.  This should allow for messages to be mapped full
    JSON objects which look just like regular messages so that they can
    be consumed by applications without any change.
@@ -177,7 +141,8 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    For upgrades and more advance uses we added an "encoding enum" that
    defines known values for arbitrary data ("0"), JSON ("1") and CBOR
    ("2").  CBOR _should_ be good at converting it's values to JSON for
-   integration and backwards compatability.
+   integration and backwards compatability to other parts of the SSB
+   stack.
 
 3.  Definitions for SSB
 
@@ -196,10 +161,19 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    o  The "sequence" number of the entry as an unsigned integer.
       Increasing by 1 each entry, starting with 1.
 
-   o  An unsigned integer describing a "timestamp".  Like in node/
-      javascript, unix epoch timestamp but in milliseconds.
 
-   o  "content": a group of three fields:
+
+
+
+Bubert                  Expires February 3, 2020                [Page 3]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
+   o  An unsigned integer describing a "timestamp".  UNIX epoch
+      timestamp (number of seconds since 1970-01-01).
+
+   o  "content": an array of three fields:
 
       *  "hash" as a cipherlink
 
@@ -209,8 +183,8 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
 3.2.  Transfer
 
-   The next needed message structure is "transfer".  It consists of
-   three byte arrays:
+   The next needed structure is "transfer".  It consists of three byte
+   arrays:
 
    o  The encoded bytes of an _Event_, here called "eventData".
 
@@ -219,26 +193,19 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
    o  the optional "content": a maximum of 64k bytes.
 
+   To validate an incoming signed event, the receiver just takes the
+   "eventData" and the "signature" and passes them to the cryptographic
+   function that does the validation.  In this case, edwards25519 as
+   defined in [RFC8032], also known as Ed25519 from the Networking and
+   Cryptography library (NaCL) [4].
 
-
-Bubert                  Expires January 30, 2020                [Page 4]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
-   To validate a message, the receiver just takes the "eventData" and
-   the "signature" and passes them to the cryptographic function that
-   does the validation.  In this case, edwards25519 as defined in
-   [RFC8032], also known as Ed25519 from Networking and Cryptography
-   library (NaCL) [5].
-
-   If present, hashing the "content" needs to compute the same the as
-   the "content.hash" field on the event.  If it should be ommited, it
-   needs to be set to null (primitive 22 or "0xf6" in CBOR) to keep the
-   array it's contained in of length three.
+   If present, hashing the "content" needs to compute the same hash as
+   stated by the "content.hash" field on the event.  If it should be
+   ommited, it needs to be set to null (primitive 22 or "0xf6" in CBOR)
+   to keep the array it's contained in of length three.
 
    The Hash of a signed event (and the "previous" field of the next
-   event) is the blak2b-256 of "eventData" and "signature" bytes
+   event) is the SHA256 of "eventData" and "signature" bytes
    concataneted.
 
 3.3.  Cipherlinks
@@ -252,13 +219,20 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
    Currently there are these different reference types:
 
+
+
+Bubert                  Expires February 3, 2020                [Page 4]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
    o  "0x01": references to gabby grove formatted feeds (ED25519 Public
       Key, 32bytes of data)
 
    o  "0x02": gabby grove signed event hashes (such as "previous"),
-      using blake2b-256 (32bytes of data)
+      using SHA256 (32bytes of data)
 
-   o  "0x03": "content.hash" also using blake2b-256 (32bytes of data)
+   o  "0x03": "content.hash" also using SHA256 (32bytes of data)
 
    o  "0x04": "SSB v1", legacy / old feed reference (ED25519 Public Key,
       32bytes of data)
@@ -267,35 +241,49 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
    o  "0x06": SHA256 binary blob hashes as used by legacy ssb
 
-   Only 1 to 3 are valid on gabby grove event fields.  4 to 6 are
+   Only 1 to 3 are used on gabby grove event fields.  4 to 6 are
    intended to encode cipherlinks in CBOR encoded content when
    referencing feeds in the legacy format.  I'm relativly certain and
    hopefull this will be revised and extended but it feels like a good
    starting point.  They all should be convertable to and from the
    base64 encoded ASCII references we currently use in JSON.
 
-
-
-
-Bubert                  Expires January 30, 2020                [Page 5]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    We add one byte as prefix to those bytes, making all references
-   33bytes long.
+   33bytes long, for now.
+
+3.3.1.  Cross references
+
+   Up until now SSB only had to deal with ".ed25519" and ".sha256" to
+   identify a whole feed and individual messages respectivly.  Although
+   I'd like to avoid a registry of known suffixes, my initial thoughts
+   [5] on how to do that are still very vague.  For the meantime, I
+   propose the ".ggfeed-v1" suffix as a default feed reference and
+   ".ggmsg-v1" for messages.
+
+   I also briefly looked into IPFS Content Identifiers (CID)s [6] and
+   Decentralized Identifiers (DIDs) [7] but discarded them since it
+   leaves the scope of this specification.  It's only important that we
+   clearly discerne and define type and data of these identifiers so
+   that we can convert to and from them down the road.
 
 4.  CBOR
 
 4.1.  Basics
 
    If you never worked with CBOR, I suggest checking out it's website
-   [6] and the definitions in [RFC7049]).  Similar to JSON it is a _self
+   [8] and the definitions in [RFC7049]).  Similar to JSON it is a _self
    describing_ format.  Which means, bytes of it can be translated to
    logical, typed values without the need for a schema definition.
 
+
+
+Bubert                  Expires February 3, 2020                [Page 5]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
    What helped me a lot as well to understand it better were the cbor-
-   diag utilities [7] (or the the playground at cbor.me [8] with the
+   diag utilities [9] (or the the playground at cbor.me [10] with the
    same features).  With it, you can translate between bytes and the
    diagnostic noation (defined in section 6 of it's RFC).  Roughly
    speaking you can use JSON like literals as diagnostic input for
@@ -330,14 +318,6 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    _A4 means the following is a map with 3 entries_.  Maps are key-value
    pairs, so we get three pairs of first the name (or key) of the pair
    and then the value.  Next to signed and unsigned number types it also
-
-
-
-Bubert                  Expires January 30, 2020                [Page 6]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    has predefined primitives for "true", "false" and "null".  Notice
    that the keys are also typed (_text of len N_).
 
@@ -346,6 +326,17 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    ["test", 123, false, null]
 
    results in
+
+
+
+
+
+
+
+Bubert                  Expires February 3, 2020                [Page 6]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
 
    84             # array(4)
       64          # text(4)
@@ -379,27 +370,29 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    incorrectly consume forked heads as actual messages.
 
    However, as an experiment, implementers are advised to use the
-   canonical CBOR suggestions defined in Section 3.9 [9].  Since we only
-   use bytes, integers and tags for our strucutres we can ignore the
-   suggestions for map keys and floats.
+   canonical CBOR suggestions defined in Section 3.9 [11].  Since we
+   only use bytes, integers and tags for our strucutres we can ignore
+   the suggestions for map keys and floats.
 
    Potentially, a canonical encoding would allow for skipping certain
    fields on the transport layer.  "author", "sequence" and even
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 7]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    "previous" could be filled in by the receiver themselvs to produce
    the full "eventData".
 
    It would also free implementors on the question of how to store
    events.  It's unclear to the author if this amounts to a worth-while
    endevor tompare to just storing the bytes of the "transfer".
+
+
+
+
+
+
+
+Bubert                  Expires February 3, 2020                [Page 7]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
 
 4.3.  Extensability
 
@@ -416,70 +409,11 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    signature was computed by the author's key-pair referenced inside the
    "event".
 
-   See Section 2.4 of CBORs RFC [10] for more.
-
-4.4.  CDDL
-
-   Here is an exceprt of the format specfication in _Concise data
-   definition language (CDDL)_ [RFC8610] which describes the "event" and
-   "content" objects.  The full file is attached as Appendix A.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 8]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
-   event = [
-     previous: cipherlink,
-     author: cipherlink,
-     sequence: uint,
-     timestamp: uint,
-     content,
-   ]
-
-   content = [
-       hash: cipherlink,
-       size: uint16,
-       encoding: contentEncoding,
-   ]
-
-   ; 33 bytes, tagged with major type 6, number 1050
-   cipherlink = #6.1050(bytes .size 33)
-
-   ; possible values for content encoding are 0, 1 and 2
-   contentEncoding = 0..2
-
-   ; 16-bit unsigned int, equivalent to 0..65536
-   uint16 = uint .size 2
-
-   It allows for more detailed description and definition of valid
-   objects and seems like an interesting tool to define supported types
-   and messages for higher levels of SSB as well.
+   See Section 2.4 of CBORs RFC [12] for more.
 
 5.  Code and roll out
 
-   the current work-in-progress repository can be found here [11].
+   the current work-in-progress repository can be found here [13].
 
    It experiments with Go and javascript interoperability and shows that
    signature verification and content hashing works as expected.
@@ -496,16 +430,6 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    The upcoming verse app will use this format, possibly only with
    encoding content as json for now.
 
-
-
-
-
-
-Bubert                  Expires January 30, 2020                [Page 9]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
 6.  Remarks
 
 6.1.  Alternative Encodings
@@ -519,6 +443,13 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 
    o  Cap'n Proto: seemed like a bit bleeding edge.
 
+
+
+Bubert                  Expires February 3, 2020                [Page 8]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
    o  MessgePack: my reading of Appendix E, it's quite stable but
       extension mechanism is in a dead end.
 
@@ -526,7 +457,7 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
       only interesting for event entries, not higher levels of the stack
 
    Appendix E.  (Comparison of Other Binary Formats to CBOR's Design
-   Objectives) [12] also shows how CBOR compares to ASN.1/DER/BER, BSON
+   Objectives) [14] also shows how CBOR compares to ASN.1/DER/BER, BSON
    and UBJSON.
 
 6.2.  Deletion requests
@@ -554,14 +485,6 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    by something else once it surfaces.  As a migration path, I'd suggest
    we double down on "sameAs".  The _simplest_ case of it would be
    terminating one feed and starting a new one, while logically
-
-
-
-Bubert                  Expires January 30, 2020               [Page 10]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    appending one to the other for higher levels of the protocol stack.
    The implications for indexing things like the friend graph and how to
    end feeds in the old format show that this needs to be coverted in a
@@ -572,9 +495,20 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    Apart from chosing another library to CBOR for encoding the bytes
    this proposal changed the name of a couple of things.
 
+
+
+
+
+
+
+Bubert                  Expires February 3, 2020                [Page 9]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
 7.1.  Event
 
-   as @cft [13] mentioned in his first comment [14], _Message_ and
+   as @cft [15] mentioned in his first comment [16], _Message_ and
    _Meta_ were not easy to speak and reason about.  "What includes
    what?" wasn't easy enough to answer.  The _Message_ was conceptually
    redundant as well since it's fields can be in the _Transfer_
@@ -588,13 +522,49 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    not specific enough.  This field deals with the _encoding_ of the
    content and thus should be named as such.
 
-7.3.  Algorithmic choices
+8.  Comments addressed since the first "off-chain content" proposal
 
-   It tries to be more explicit with it's cryptographic algorithms.
+   Remarks this proposal addresses over the first Off-chain content
+   proposal [17]:
 
-8.  References
+8.1.  incrementing on a broken format
 
-8.1.  Informative References
+   The main idea of the first proposal was to add offchain-content
+   without overhauling the verification scheme.  We got numerous
+   comments on this, the gist being that we tried to hard, improving
+   something that should be deprecated altogether.
+
+   Therefore we chose a clean slate approach with a new encoding scheme.
+   This comes with the downside of requiring multiple supported _feed
+   formats_ in the stack.  Personally I think this is good though as it
+   will pave the way for other formats, like bamboo, as well.
+
+8.2.  The use of muxprc specific features for transmission/replication
+
+   The idea to transmit content and metadata as two muxrpc frames was my
+   idea.  It seems sensible/practical because it fitted into the
+   existing stack but I see now that it tried to much to fit into the
+   existing way and hid a dependency along the way.
+
+   This is why we have the "transfer" message definition which has two
+   fields.  One for the message, which should be required and one field
+   for the content, which can be omitted.
+
+
+
+
+
+
+
+
+Bubert                  Expires February 3, 2020               [Page 10]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
+9.  References
+
+9.1.  Informative References
 
    [RFC7049]  Bormann, C. and P. Hoffman, "Concise Binary Object
               Representation (CBOR)", RFC 7049, DOI 10.17487/RFC7049,
@@ -611,44 +581,58 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
               JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
               June 2019, <https://www.rfc-editor.org/info/rfc8610>.
 
-
-
-Bubert                  Expires January 30, 2020               [Page 11]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
-8.2.  URIs
+9.2.  URIs
 
    [1] https://cbor.io
 
-   [2] %3ATKLKIHdM+beamr1dqoO2Jd6BC7oW5zj0ygLvmDsEc=.sha256
+   [2] ssb://%3ATKLKIHdM+beamr1dqoO2Jd6BC7oW5zj0ygLvmDsEc=.sha256
 
-   [3] %LrMcs9tqgOMLPGv6mN5Z7YYxRQ8qn0JRhVi++OyOvQo=.sha256
+   [3] ssb://%1AsqTRxdVrbfypC69W7uWbMClQteNNnnl3ohzbpu3Xw=.sha256
 
-   [4] %1AsqTRxdVrbfypC69W7uWbMClQteNNnnl3ohzbpu3Xw=.sha256
+   [4] https://nacl.cr.yp.to/
 
-   [5] https://nacl.cr.yp.to/
+   [5] ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256
 
-   [6] https://cbor.io
+   [6] https://docs.ipfs.io/guides/concepts/cid/
 
-   [7] https://github.com/cabo/cbor-diag
+   [7] https://w3c-ccg.github.io/did-spec/
 
-   [8] https://cbor.me
+   [8] https://cbor.io
 
-   [9] https://tools.ietf.org/html/rfc7049#section-3.9
+   [9] https://github.com/cabo/cbor-diag
 
-   [10] https://tools.ietf.org/html/rfc7049#section-2.4
+   [10] https://cbor.me
 
-   [11] http://cryptbox.mindeco.de/ssb/gabbygrove
+   [11] https://tools.ietf.org/html/rfc7049#section-3.9
 
-   [12] https://tools.ietf.org/html/rfc7049#appendix-E
+   [12] https://tools.ietf.org/html/rfc7049#section-2.4
 
-   [13] @AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519
+   [13] http://cryptbox.mindeco.de/ssb/gabbygrove
 
-   [14] %pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256
+   [14] https://tools.ietf.org/html/rfc7049#appendix-E
 
-Appendix A.  CDDL Spec v1
+
+
+Bubert                  Expires February 3, 2020               [Page 11]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
+   [15] @AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519
+
+   [16] ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256
+
+   [17] ssb://%LrMcs9tqgOMLPGv6mN5Z7YYxRQ8qn0JRhVi++OyOvQo=.sha256
+
+Appendix A.  CDDL
+
+   As a teaser for possible future work, here is the format specfication
+   in _Concise data definition language (CDDL)_ [RFC8610] which
+   describes the "event", "content" and "transfer" objects.
+
+   It allows for more detailed description and definition of valid
+   objects and seems like an interesting tool to define supported types
+   and messages for higher levels of SSB as well.
 
    ; this document uses the Concise data definition language (CDDL)
    ; https://tools.ietf.org/html/rfc8610
@@ -666,14 +650,6 @@ Appendix A.  CDDL Spec v1
      sequence: uint,
      timestamp: uint,
      content,
-
-
-
-Bubert                  Expires January 30, 2020               [Page 12]
-
-SSB-Draft                   DRAFT GabbyGrove                   July 2019
-
-
    ]
 
    content = [
@@ -690,6 +666,14 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
    ; https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags
 
    ; possible values for content encoding are 0, 1 and 2
+
+
+
+Bubert                  Expires February 3, 2020               [Page 12]
+
+SSB-Draft                   DRAFT GabbyGrove                 August 2019
+
+
    ; 0 means _arbitrary bytes_ (like an private message, image or tar)
    ; 1 means json
    ; 2 means cbor
@@ -716,7 +700,7 @@ SSB-Draft                   DRAFT GabbyGrove                   July 2019
 Author's Address
 
    Henry Florenz Bubert
-   ssb:@p13zSAiOpguI9nsawkGijsnMfWmFd5rlUNpzekEE+vI=.ed25519
+   SSBC
 
    Email: cryptix@riseup.net
 
@@ -725,4 +709,20 @@ Author's Address
 
 
 
-Bubert                  Expires January 30, 2020               [Page 13]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bubert                  Expires February 3, 2020               [Page 13]

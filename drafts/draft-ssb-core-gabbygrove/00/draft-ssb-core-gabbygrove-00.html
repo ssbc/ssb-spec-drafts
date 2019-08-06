@@ -5,7 +5,7 @@
 <head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
   <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
 
-  <title>GabbyGrove (CBOR based Feed Format)</title>
+  <title>GabbyGrove (CBOR-based Feed Format)</title>
 
   <style type="text/css" title="Xml2Rfc (sans serif)">
   /*<![CDATA[*/
@@ -384,10 +384,15 @@
 <link href="#rfc.section.3.2" rel="Chapter" title="3.2 Transfer">
 <link href="#rfc.section.3.3" rel="Chapter" title="3.3 Cipherlinks">
 <link href="#rfc.section.3.3.1" rel="Chapter" title="3.3.1 Cross references">
+<link href="#rfc.section.3.4" rel="Chapter" title="3.4 Signing capability">
 <link href="#rfc.section.4" rel="Chapter" title="4 CBOR">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 Basics">
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Canonical encoding">
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 Extensibility">
+<link href="#rfc.section.4.4" rel="Chapter" title="4.4 Examples">
+<link href="#rfc.section.4.4.1" rel="Chapter" title="4.4.1 Key Pair">
+<link href="#rfc.section.4.4.2" rel="Chapter" title="4.4.2 Event">
+<link href="#rfc.section.4.4.3" rel="Chapter" title="4.4.3 Transfer">
 <link href="#rfc.section.5" rel="Chapter" title="5 Code and roll out">
 <link href="#rfc.section.6" rel="Chapter" title="6 Remarks">
 <link href="#rfc.section.6.1" rel="Chapter" title="6.1 Alternative Encodings">
@@ -401,18 +406,17 @@
 <link href="#rfc.section.8.1" rel="Chapter" title="8.1 incrementing on a broken format">
 <link href="#rfc.section.8.2" rel="Chapter" title="8.2 The use of MUXRPC specific features for transmission/replication">
 <link href="#rfc.references" rel="Chapter" title="9 Informative References">
-<link href="#rfc.appendix.A" rel="Chapter" title="A CDDL">
 <link href="#rfc.authors" rel="Chapter">
 
 
   <meta name="generator" content="xml2rfc version 2.22.3 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
-  <meta name="dct.creator" content="Bubert, H." />
+  <meta name="dct.creator" content="cryptix, ." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ssb-core-gabbygrove-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-08-02" />
-  <meta name="dct.abstract" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed." />
-  <meta name="description" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed." />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-08-06" />
+  <meta name="dct.abstract" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: Be easier to implement compared to the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, the feed entry only references content by hash to enable content deletion without breaking verification of the feed." />
+  <meta name="description" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: Be easier to implement compared to the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, the feed entry only references content by hash to enable content deletion without breaking verification of the feed." />
 
 </head>
 
@@ -423,7 +427,7 @@
     
     	<tr>
 <td class="left">Secure Scuttlebutt Working Group</td>
-<td class="right">H. Bubert</td>
+<td class="right">. cryptix</td>
 </tr>
 <tr>
 <td class="left">SSB-Draft</td>
@@ -431,10 +435,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Informational</td>
-<td class="right">August 02, 2019</td>
+<td class="right">August 06, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: February 3, 2020</td>
+<td class="left">Expires: February 7, 2020</td>
 <td class="right"></td>
 </tr>
 
@@ -442,15 +446,15 @@
     </tbody>
   </table>
 
-  <p class="title">GabbyGrove (CBOR based Feed Format)<br />
+  <p class="title">GabbyGrove (CBOR-based Feed Format)<br />
   <span class="filename">draft-ssb-core-gabbygrove-00</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: be easier to implement then the current scheme. Hence, it uses <a href="https://cbor.io">CBOR</a> <a href="#RFC7049" class="xref">[RFC7049]</a> to encode the logical values that describe each entry.  Secondly, it only reference content by hash on the feed entry to enable content deletion without breaking verification of the feed.</p>
+<p>This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: Be easier to implement compared to the current scheme. Hence, it uses <a href="https://cbor.io">CBOR</a> <a href="#RFC7049" class="xref">[RFC7049]</a> to encode the logical values that describe each entry.  Secondly, the feed entry only references content by hash to enable content deletion without breaking verification of the feed.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>SSB-Drafts are working documents of the Secure Scuttlebutt community.  Note that other groups may also distribute working documents as SSB-Drafts.</p>
 <p>SSB-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use SSB-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This SSB-Draft will expire on February 3, 2020.</p>
+<p>This SSB-Draft will expire on February 7, 2020.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 SSB Council and the persons identified as the document authors.  All rights reserved.</p>
 
@@ -479,7 +483,9 @@
 </li>
 <ul><li>3.3.1.   <a href="#rfc.section.3.3.1">Cross references</a>
 </li>
-</ul></ul><li>4.   <a href="#rfc.section.4">CBOR</a>
+</ul><li>3.4.   <a href="#rfc.section.3.4">Signing capability</a>
+</li>
+</ul><li>4.   <a href="#rfc.section.4">CBOR</a>
 </li>
 <ul><li>4.1.   <a href="#rfc.section.4.1">Basics</a>
 </li>
@@ -487,7 +493,15 @@
 </li>
 <li>4.3.   <a href="#rfc.section.4.3">Extensibility</a>
 </li>
-</ul><li>5.   <a href="#rfc.section.5">Code and roll out</a>
+<li>4.4.   <a href="#rfc.section.4.4">Examples</a>
+</li>
+<ul><li>4.4.1.   <a href="#rfc.section.4.4.1">Key Pair</a>
+</li>
+<li>4.4.2.   <a href="#rfc.section.4.4.2">Event</a>
+</li>
+<li>4.4.3.   <a href="#rfc.section.4.4.3">Transfer</a>
+</li>
+</ul></ul><li>5.   <a href="#rfc.section.5">Code and roll out</a>
 </li>
 <li>6.   <a href="#rfc.section.6">Remarks</a>
 </li>
@@ -513,8 +527,6 @@
 </li>
 </ul><li>9.   <a href="#rfc.references">Informative References</a>
 </li>
-<li>Appendix A.   <a href="#rfc.appendix.A">CDDL</a>
-</li>
 <li><a href="#rfc.authors">Author's Address</a>
 </li>
 
@@ -528,21 +540,21 @@
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#rationale" id="rationale">Rationale</a>
 </h1>
-<p id="rfc.section.2.p.1">While this is would introduce radical new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding off-chain capabilities. Let me elaborate on two of them which cater to this point specifically:</p>
+<p id="rfc.section.2.p.1">While this is would introduce new ways of doing things, like requiring CBOR for encoding and supporting multiple feed formats, it also makes concessions to how things are currently. In a sense this proposal should be seen as an overhaul of the current scheme, only adding off-chain capabilities. Let me elaborate on two of them which cater to this point specifically:</p>
 <h1 id="rfc.section.2.1">
 <a href="#rfc.section.2.1">2.1.</a> <a href="#keeping-the-timestamp" id="keeping-the-timestamp">Keeping the timestamp</a>
 </h1>
-<p id="rfc.section.2.1.p.1">In principle, the timestamp is an application concern. Some types of messages could omit the timestamp and it could be considered <em>cleaner</em> to move them up into the content of the types that want/need them. We recognize however that it would stir up problems for existing applications and this is something we are not interested in.</p>
+<p id="rfc.section.2.1.p.1">In principle, the timestamp is an application concern. Some types of messages could omit the timestamp and it could be considered <em>cleaner</em> to move them up into the content of messages which want to supply them. We recognize however that it would stir up problems for existing applications and this is something we are not interested in.</p>
 <h1 id="rfc.section.2.2">
 <a href="#rfc.section.2.2">2.2.</a> <a href="#keeping-the-author-field" id="keeping-the-author-field">Keeping the author field</a>
 </h1>
 <p id="rfc.section.2.2.p.1">A similar argument could be made for the author. In the current design the author never changes over the lifetime of a feed, so why have it on each and every entry of a feed? Especially if you replicate one feed at a time it seems wasteful, since the author is already known.</p>
-<p id="rfc.section.2.2.p.2">Dominic made a pretty good security argument <a href="ssb://%1AsqTRxdVrbfypC69W7uWbMClQteNNnnl3ohzbpu3Xw=.sha256">here</a>. It should always be known which key-pair created a signature and thus having it reduces ambiguity and possible backdoors.</p>
+<p><a href="ssb://@EMovhfIrFk4NihAKnRNhrfRaqIhBv1Wj8pTxJNgvCCY=.ed25519">Dominic Tarr</a> made a security argument <a href="ssb://%1AsqTRxdVrbfypC69W7uWbMClQteNNnnl3ohzbpu3Xw=.sha256">here</a>. It should always be known which key-pair created a signature and thus having it reduces ambiguity and possible backdoors.</p>
 <h1 id="rfc.section.2.3">
 <a href="#rfc.section.2.3">2.3.</a> <a href="#only-encoding-the-content" id="only-encoding-the-content">Only encoding the content</a>
 </h1>
-<p id="rfc.section.2.3.p.1">This format would only encode the metadata as CBOR, leaving the <em>user</em> to encode their content as they see fit.  Since we don&#8217;t want to cause problems for applications, we suggest keeping the <samp>content</samp> portion in JSON <a href="#RFC8259" class="xref">[RFC8259]</a>.  This should allow for events to be mapped full JSON objects which look just like regular, legacy messages so that they can be consumed by applications without any change.</p>
-<p id="rfc.section.2.3.p.2">For upgrades and more advance uses we added an <samp>encoding enum</samp> that defines known values for arbitrary data (<samp>0</samp>), JSON (<samp>1</samp>) and CBOR (<samp>2</samp>).  CBOR <em>should</em> be good at converting it&#8217;s values to JSON for integration and backwards compatibility to other parts of the SSB stack.</p>
+<p id="rfc.section.2.3.p.1">At first, this format would only encode the header fields of a message (subsequently called <samp>event</samp>) as CBOR, leaving the author of a feed to encode their content as they see fit.  An encoding enumeration field on the <samp>event</samp> sets one of a set of known values for arbitrary data (<samp>0</samp>), JSON (<samp>1</samp>) and CBOR (<samp>2</samp>).</p>
+<p id="rfc.section.2.3.p.2">Since we don&#8217;t want to cause problems for applications, we suggest keeping the <samp>content</samp> portion in JSON <a href="#RFC8259" class="xref">[RFC8259]</a> for now.  This should allow for events to be mapped to full JSON objects which look just like regular, legacy messages so that they can be consumed by applications with minimal changes.  CBOR <em>should</em> be good at converting it&#8217;s values to JSON for integration and backwards compatibility to other parts of the SSB stack.</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#definitions-for-ssb" id="definitions-for-ssb">Definitions for SSB</a>
 </h1>
@@ -575,19 +587,19 @@
 <p></p>
 
 <ul>
-<li>The encoded bytes of an <em>event</em>, here called <samp>eventData</samp>.</li>
+<li>The encoded bytes of an <samp>event</samp>, here called <samp>eventData</samp>.</li>
 <li>
 <samp>signature</samp>: 64 bytes, to be verified against the <samp>author</samp>s public key from the event.</li>
 <li>the optional <samp>content</samp>: a maximum of 64k bytes.</li>
 </ul>
-<p id="rfc.section.3.2.p.3">To validate the <em>event</em>, the receiver just takes the <samp>eventData</samp> and the <samp>signature</samp> and passes them to the cryptographic function that does the validation.  In this case, edwards25519 as defined in <a href="#RFC8032" class="xref">[RFC8032]</a>, also known as Ed25519 from the <a href="https://nacl.cr.yp.to/">Networking and Cryptography library (NaCL)</a>.</p>
+<p id="rfc.section.3.2.p.3">To validate the <samp>transfer</samp>, the receiver takes the byte strings <samp>eventData</samp> and <samp>signature</samp> and passes them to the cryptographic function that does the validation.  The only supported functions of this format is, edwards25519 as defined in <a href="#RFC8032" class="xref">[RFC8032]</a>, also known as Ed25519 from the <a href="https://nacl.cr.yp.to/">Networking and Cryptography library (NaCL)</a>.</p>
 <p id="rfc.section.3.2.p.4">If <samp>content</samp> is present, hashing it needs to compute the same hash as stated by the <samp>content.hash</samp> field on the event.  To omit the <samp>content</samp>, it needs to be set to <samp>null</samp> (primitive 22 or <samp>0xf6</samp> in CBOR), so that the array the field is contained in has the same size in both cases.</p>
 <p id="rfc.section.3.2.p.5">The hash of a signed event (and the <samp>previous</samp> field of the next event) is the SHA256 of <samp>eventData</samp> and <samp>signature</samp> bytes concatenated.</p>
 <h1 id="rfc.section.3.3">
 <a href="#rfc.section.3.3">3.3.</a> <a href="#cipherlinks" id="cipherlinks">Cipherlinks</a>
 </h1>
-<p id="rfc.section.3.3.p.1">The hashes and public key references are not base64 encoded readable ASCII strings but are binary encoded.</p>
-<p id="rfc.section.3.3.p.2">In this first version we don&#8217;t plan to support many formats, which is why I decided against something like IPFS Multihash, which supports every hash function under the sun.</p>
+<p id="rfc.section.3.3.p.1">The hashes and public key references are not base64 encoded readable ASCII text strings but are binary encoded.</p>
+<p id="rfc.section.3.3.p.2">In this first version we don&#8217;t plan to support many formats, which is why we don&#8217;t use something like <a href="https://github.com/multiformats/multihash">IPFS Multihash</a>, which supports every hash function under the sun.</p>
 <p id="rfc.section.3.3.p.3">Currently there are these different reference types:</p>
 <p></p>
 
@@ -605,13 +617,17 @@
 <li>
 <samp>0x06</samp>: SHA256 binary blob hashes as used by legacy ssb</li>
 </ul>
-<p id="rfc.section.3.3.p.5">Only 1 to 3 are used on gabby grove event fields.  4 to 6 are intended to encode cipherlinks in CBOR encoded content when referencing feeds in the legacy format.  I&#8217;m relatively certain and hopeful this will be revised and extended but it feels like a good starting point.  They all should be convertible to and from the base64 encoded ASCII references we currently use in JSON.</p>
-<p id="rfc.section.3.3.p.6">We add one byte as prefix to those bytes, making all references 33bytes long, for now.</p>
+<p id="rfc.section.3.3.p.5">Only 1, 2 and 3 are used on gabby grove event fields.  4 to 6 are intended to encode cipherlinks in CBOR encoded content when referencing feeds in the legacy format.  I&#8217;m relatively certain and hopeful this will be revised and extended but it feels like a good starting point.  They all should be convertible to and from the base64 encoded ASCII references we currently use in JSON.  We add one byte as prefix to those bytes, making all references 33bytes long, for now.</p>
 <h1 id="rfc.section.3.3.1">
 <a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#cross-references" id="cross-references">Cross references</a>
 </h1>
-<p id="rfc.section.3.3.1.p.1">Up until now SSB only had to deal with <samp>.ed25519</samp> and <samp>.sha256</samp> to identify a whole feed and individual entries respectively. Although I&#8217;d like to avoid a registry of known suffixes, my <a href="ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256">initial thoughts</a> on how to do <em>decent</em> subjective name-spaces for identifier and networks are still very vague. For the meantime, I propose the <samp>.ggfeed-v1</samp> suffix as a default feed reference and <samp>.ggmsg-v1</samp> for messages.</p>
-<p id="rfc.section.3.3.1.p.2">I also briefly looked into <a href="https://docs.ipfs.io/guides/concepts/cid/">IPFS Content Identifiers (CID)s</a> and <a href="https://w3c-ccg.github.io/did-spec/">Decentralized Identifiers (DIDs)</a> but discarded them since it leaves the scope of this specification. It&#8217;s only important that we clearly discern and define type and data of these identifiers so that we can convert to and from them down the road.</p>
+<p id="rfc.section.3.3.1.p.1">Up until now SSB only had to deal with <samp>.ed25519</samp> and <samp>.sha256</samp> to identify a whole feed and individual entries respectively. Although I&#8217;d like to avoid a registry of known suffixes, my <a href="ssb://%t5mSAGJZEWus/HO+180M9SSsn5irHg/LVQTVqODFS9I=.sha256">initial thoughts</a> on how to do <em>decent</em> subjective name-spaces for identifier and networks are still very vague. For the meantime, this document proposes the <samp>.ggfeed-v1</samp> suffix as a default feed reference and <samp>.ggmsg-v1</samp> for messages.</p>
+<p id="rfc.section.3.3.1.p.2">The author also briefly looked into <a href="https://docs.ipfs.io/guides/concepts/cid/">IPFS Content Identifiers (CID)s</a> and <a href="https://w3c-ccg.github.io/did-spec/">Decentralized Identifiers (DIDs)</a> but discarded them since it leaves the scope of this specification. It&#8217;s only important that we clearly discern and define type and data of these identifiers so that we can convert to and from them down the road.</p>
+<h1 id="rfc.section.3.4">
+<a href="#rfc.section.3.4">3.4.</a> <a href="#signing-capability" id="signing-capability">Signing capability</a>
+</h1>
+<p id="rfc.section.3.4.p.1">The existing legacy format has an <a href="https://github.com/ssbc/ssb-keys#signobjkeys-hmac_key-obj">optional HMAC signing capability</a>. When enabled, a hashed message authentication code (<a href="https://en.wikipedia.org/wiki/HMAC">HMAC</a>) is signed instead of the the message (the <samp>event</samp> bytes inside a <samp>transfer</samp> in our case). For this a (usually secret among the users of the network) key is needed. Without this key for the HMAC function, the receiver can&#8217;t validate the signature. Because messages are still communicated as clear text, this mode doesn&#8217;t add any confidentiality, which the needed key might imply. Therefore this mode is primarily usefull for splitting networks of feeds, like for testing purposes.</p>
+<p id="rfc.section.3.4.p.2">Currently this format uses exactly the same scheme as the legacy format for portability reasons.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#cbor" id="cbor">CBOR</a>
 </h1>
@@ -619,7 +635,7 @@
 <a href="#rfc.section.4.1">4.1.</a> <a href="#basics" id="basics">Basics</a>
 </h1>
 <p id="rfc.section.4.1.p.1">If you never worked with CBOR, I suggest checking out it&#8217;s <a href="https://cbor.io">website</a> and the definitions in <a href="#RFC7049" class="xref">[RFC7049]</a>). Similar to JSON it is a <em>self describing</em> format. Which means, bytes of it can be translated to logical, typed values without the need for a schema definition.</p>
-<p id="rfc.section.4.1.p.2">What helped me a lot as well to understand it better were the <a href="https://github.com/cabo/cbor-diag">cbor-diag utilities</a> (or the <a href="https://cbor.me">the playground at cbor.me</a> with the same features).  With it, you can translate between bytes and the diagnostic notation (defined in section 6 of it&#8217;s RFC).  Roughly speaking you can use JSON like literals as diagnostic input for <samp>diag2pretty.rb</samp> (or the left side of the playground):</p>
+<p id="rfc.section.4.1.p.2">The <a href="https://github.com/cabo/cbor-diag">cbor-diag utilities</a> (or the <a href="https://cbor.me">the playground at cbor.me</a> with the same features) can help a lot to see how it works. With it, we can translate between encoded bytes and the diagnostic notation (defined in section 6 of CBORs RFC).  Roughly speaking we can use JSON-like literals as diagnostic input for <samp>diag2pretty.rb</samp> (or the left side of the playground):</p>
 <pre>
 {
   "type": "test",
@@ -645,8 +661,8 @@ A4               # map(4)
       6C696E6B   # "link"
    F6            # primitive(22)
 </pre>
-<p id="rfc.section.4.1.p.4">The comments tell us the types and values again. The first line says <em>A4 means the following is a map with 3 entries</em>.  Maps are key-value pairs, so we get three pairs of first the name (or key) of the pair and then the value.  Next to signed and unsigned number types it also has predefined primitives for <samp>true</samp>, <samp>false</samp> and <samp>null</samp>.  Notice that the keys are also typed (<em>text of len N</em>).</p>
-<p id="rfc.section.4.1.p.5">Let&#8217;s compare it to an array of the same values, without the keys:</p>
+<p id="rfc.section.4.1.p.4">The comments (everything right of the <samp>#</samp> character) tell us the types and values again. The first line says &#8220;0xA4 means the following is a map with 4 entries&#8221;.  Maps are key-value pairs, so we get three pairs of first the name (or key) of the pair and then the value.  Next to signed and unsigned number types it also has predefined primitives for <samp>true</samp>, <samp>false</samp> and <samp>null</samp>.  Notice that the keys are also typed (<em>text of len N</em>).</p>
+<p id="rfc.section.4.1.p.5">Let&#8217;s compare the previous example to an array of the same values, without the keys:</p>
 <pre>
 ["test", 123, false, null]
 </pre>
@@ -661,28 +677,145 @@ A4               # map(4)
 </pre>
 <p id="rfc.section.4.1.p.7">This results in 10 encoded bytes. The map example needs 31, in comparison.</p>
 <p id="rfc.section.4.1.p.8">Encoding the same well-defined objects as maps over and over again comes with a lot of overhead and redundant description of the field names.</p>
-<p id="rfc.section.4.1.p.9">This was my main concern in comparison to Protocol Buffers. A self-describing format isn&#8217;t that useful here since the fields don&#8217;t change.  As shown above, the size overhead of encoding structures as maps can be mitigated by encoding them as arrays instead.</p>
+<p id="rfc.section.4.1.p.9">This is also why the previous attempt to define a new feed format used Protocol Buffers. A self-describing format isn&#8217;t inherently useful since the fields of an <samp>event</samp> don&#8217;t change.  As shown above, the size overhead of encoding structures as maps can be mitigated by encoding them as arrays instead.</p>
 <h1 id="rfc.section.4.2">
 <a href="#rfc.section.4.2">4.2.</a> <a href="#canonical-encoding" id="canonical-encoding">Canonical encoding</a>
 </h1>
-<p id="rfc.section.4.2.p.1">We <em>could</em> define the first field of a <samp>transfer</samp> as an <em>event</em> itself instead of opaque bytes but I want to make canonical encoding on this level of the protocol optional.  Meaning: if you can re-produce the same <samp>eventData</samp> from an de-coded stored <samp>Event</samp>, go ahead.  Butt, diverging one bit from the original <samp>eventData</samp> means that signature verification and hash comparison will fail.  Over all this seems like an potentially instable and divergent way of exchanging feeds, producing incorrect references as heads of a feed if implementations incorrectly consume them.</p>
-<p id="rfc.section.4.2.p.2">However, as an experiment, implementers are advised to use the canonical CBOR suggestions defined in <a href="https://tools.ietf.org/html/rfc7049#section-3.9">Section 3.9</a>.  Since we only use bytes, integers and tags for our structures we can ignore the suggestions for map keys and floats.</p>
+<p id="rfc.section.4.2.p.1">We <em>could</em> define the first field of a <samp>transfer</samp> as an <samp>event</samp> itself instead of opaque byte strings but canonical encoding on this level of the protocol is seen as optional.  Meaning: if the implementation can re-produce the same <samp>eventData</samp> from an stored <samp>Event</samp>, go ahead.  Butt be wary, diverging one bit from the original <samp>eventData</samp> means that signature verification and hash comparison will fail.  Over all this seems like an potentially instable and divergent way of exchanging feeds, producing incorrect references as heads of a feed if implementations incorrectly consume them.</p>
+<p id="rfc.section.4.2.p.2">However, as an experiment, implementers are advised to use the canonical CBOR suggestions defined in <a href="https://tools.ietf.org/html/rfc7049#section-3.9">Section 3.9 of CBORs RFC</a>.  Since we only use bytes, integers and tags for our structures we can ignore the suggestions for map keys and floats.</p>
 <p id="rfc.section.4.2.p.3">Potentially, a canonical encoding would allow for skipping certain fields on the transport layer.  <samp>author</samp>, <samp>sequence</samp> and even <samp>previous</samp> could be filled in by the receiver themselves to produce the full <samp>eventData</samp>.</p>
 <p id="rfc.section.4.2.p.4">It would also free implementors on the question of how to store events.  It&#8217;s unclear to the author if this amounts to a worth-while endeavor compared to just storing the bytes of the <samp>transfer</samp>.</p>
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#extensibility" id="extensibility">Extensibility</a>
 </h1>
-<p id="rfc.section.4.3.p.1">CBOR allows for augmenting the types of it&#8217;s values with an additional numeric tag. These are hints for the de- and encoders to treat some type of values differently.</p>
-<p id="rfc.section.4.3.p.2">This kind of extensibility through type tags seems useful for SSB, especially if we ever change away from JSON as the content encoding.  With it, we can explicitly mark cipherlinks as such, for instance.</p>
-<p id="rfc.section.4.3.p.3">Another option would be to explicitly tag the whole <samp>transfer</samp>, which is otherwise <em>just</em> an array with three entries, and state how the signature was computed by the author&#8217;s key-pair referenced inside the <samp>event</samp>.</p>
-<p id="rfc.section.4.3.p.4">See <a href="https://tools.ietf.org/html/rfc7049#section-2.4">Section 2.4 of CBORs RFC</a> for more.</p>
+<p id="rfc.section.4.3.p.1">CBOR allows for augmenting the types of it&#8217;s values with an additional numeric tag. These are hints for the de- and encoders to treat some type of values differently. See <a href="https://tools.ietf.org/html/rfc7049#section-2.4">Section 2.4 of CBORs RFC</a> for more. <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags">A list of defined CBOR Tags</a> is maintained by the IANA.</p>
+<p id="rfc.section.4.3.p.2">This kind of extensibility through type tags seems useful for SSB, especially if we ever change away from JSON as the content encoding.  With it, we can explicitly mark cipherlinks as such, for instance. I took the liberty to take one of the <em>first come first served</em> numbers for the cipherlinks above, it&#8217;s 1050.</p>
+<p><a href="https://tools.ietf.org/html/rfc7049#section-2.4.4.1">Section 2.4.4.1 of the CBOR RFC</a> also defines tag number 24 to delay decoding of embedded cbor values (like the <samp>event</samp> in the <samp>transfer</samp>). Depending on how flexible the used CBOR libarary is, this might help input validation but since each field of an <samp>event</samp> has to be checked in context of the feed for append validation, this feature was not applied to this version of the format.</p>
+<p id="rfc.section.4.3.p.4">Another option would be to explicitly tag the whole <samp>transfer</samp>, which is otherwise <em>just</em> an array with three opaque byte string entries, and state how the signature was computed by the author&#8217;s key-pair referenced inside the <samp>event</samp>. And also define the role of the actual <samp>content</samp> bytes in relation to the <samp>content</samp> field in the <samp>event</samp>.</p>
+<h1 id="rfc.section.4.4">
+<a href="#rfc.section.4.4">4.4.</a> <a href="#examples" id="examples">Examples</a>
+</h1>
+<p id="rfc.section.4.4.p.1">As a concrete example of all the above combined, here are some actual structures of this format encoded as CBOR.</p>
+<h1 id="rfc.section.4.4.1">
+<a href="#rfc.section.4.4.1">4.4.1.</a> <a href="#key-pair" id="key-pair">Key Pair</a>
+</h1>
+<p id="rfc.section.4.4.1.p.1">of the ED25519 key-pair that was seeded with <samp>dead</samp> repeated 8 times, which is a poor choice for an actual key-pair but gives us deterministic test data. I tested sodium-native on javascript and ed25519 for Go by agl and x/crypto and they all gave me these public key bytes as a hexdump:</p>
+<pre>
+00000000  AED3DAB65CE9E0D6C50D46FCEFFB5522  |....\.....F...U"|
+00000010  96ED21B6E0B537A6A0184575CE8F5CBD  |..!...7...Eu..\.|
+</pre>
+<h1 id="rfc.section.4.4.2">
+<a href="#rfc.section.4.4.2">4.4.2.</a> <a href="#event-1" id="event-1">Event</a>
+</h1>
+<p id="rfc.section.4.4.2.p.1">These are the first two messages of a feed authored by the keypair above.</p>
+<pre>
+ 1:85                                      # array(5)
+ 2:   F6                                   # primitive(22)
+ 3:   D9 041A                              # tag(1050)
+ 4:      58 21                             # bytes(33)
+ 5:         01
+ 6:         AED3DAB65CE9E0D6C50D46FCEFFB5522
+ 7:         96ED21B6E0B537A6A0184575CE8F5CBD
+ 8:   01                                   # unsigned(1)
+ 9:   1A 5D3F8880                          # unsigned(1564444800)
+10:   83                                   # array(3)
+11:      01                                # unsigned(1)
+12:      07                                # unsigned(7)
+13:      D9 041A                           # tag(1050)
+14:         58 21                          # bytes(33)
+15:            03
+16:            E806ECF2B7C37FB06DC198A9B905BE64
+17:            EE3FDB8237EF80D316ACB7C85BBF5F02
+</pre>
+<p id="rfc.section.4.4.2.p.2">Let&#8217;s discuss line by line what this means:</p>
+<p></p>
+
+<ol>
+<li>The first line, <samp>85 # array(5)</samp>, tells us <samp>0x85</samp> is the first byte and means &#8220;this is an array with five elements&#8221;. What follows are the five fields that were defined in Section 3.1 of this document: <samp>previous</samp>, <samp>author</samp>, <samp>sequence</samp>, <samp>timestamp</samp> and <samp>content</samp>.</li>
+<li>
+<samp>0xF6</samp> is the first value of this array. The <samp>primitive(22)</samp> is a special CBOR value, signaling <samp>null</samp>. So the <samp>previous</samp> hash is <samp>null</samp>, which is fine for the first message.</li>
+<li>The three bytes (<samp>0xD904A1</samp>) mean <samp>tag(1050)</samp>. This is CBORs optional tagging feature, introduced in Section 4.3 of this document. It tell&#8217;s the decoder &#8220;the following values is tagged with the number 1050&#8221;. This value describes cipherlinks, defined in Section 3.3 of this document.</li>
+<li>The following line with the two bytes <samp>0x5821</samp> just tells the decoder &#8220;the following are 33 bytes&#8221; and can be taking literally in value without any modification.</li>
+<li>These are the 33 bytes of a cipherlink. Since this cipherlink starts with a <samp>0x01</samp>, it is the public key of an author.</li>
+<li>This is the first half of the authors public key, broken in two lines of 16bytes each. (This is only to conform with the 72 character limit of text only output of this document.)</li>
+<li>This is the 2nd half of the authors public key.</li>
+<li>The next line is the third element of the array: the <samp>sequence</samp> number encoded as an unsigned integer, as the comment tells us.</li>
+<li>The fourth element is the <samp>timestamp</samp> also encoded as an unsigned integer. As a starting timestamp I picked 2019-07-30, which translates to 1564444800 seconds as a Unix epoch timestamp.</li>
+<li>The fifth element is the <samp>content</samp> object, which itself is encoded as an array of 3 items (<samp>encoding</samp>, <samp>size</samp> and <samp>hash</samp>)</li>
+<li>The number 1 means the content was encoded as <samp>json</samp> (See Section 2.3).</li>
+<li>This is the content&#8217;s <samp>size</samp>, in bytes also as an unsigned integer. Meaning, this content is 7 bytes long.</li>
+<li>Finally, we have a cipherlink again.</li>
+<li>It&#8217;s 33 bytes long</li>
+<li>It starts with 03 which means, it&#8217;s a content hash. (See Section 3.3)</li>
+<li>The following two lines are the hash function output. Where this comes from will be shown in the next section.</li>
+</ol>
+<p id="rfc.section.4.4.2.p.4">Here is the next message:</p>
+<pre>
+85                                      # array(5)
+   D9 041A                              # tag(1050)
+      58 21                             # bytes(33)
+         02
+         0113F4DD8C981D1D87BC7F46CF86E8E7
+         B0FB774F839930DD38D6A13F69D9693D
+   D9 041A                              # tag(1050)
+      58 21                             # bytes(33)
+         01
+         AED3DAB65CE9E0D6C50D46FCEFFB5522
+         96ED21B6E0B537A6A0184575CE8F5CBD
+   02                                   # unsigned(2)
+   1A 5D3F8881                          # unsigned(1564444801)
+   83                                   # array(3)
+      01                                # unsigned(1)
+      16                                # unsigned(22)
+      D9 041A                           # tag(1050)
+         58 21                          # bytes(33)
+            03
+            95CCA4FA7B24ABC6049683E716292B00
+            C49509BE147AA024C06286BD9B7DBDA8
+
+</pre>
+<p id="rfc.section.4.4.2.p.5">If you compare this to the above you should see some similarities. Instead of <samp>0xf6</samp> as the first element as the array we now have <samp>0xD0491A5821</samp>. We have seen this sequence twice above already: It&#8217;s a cipherlink with 33 bytes of data. Instead of starting with byte <samp>0x01</samp> or <samp>0x03</samp>, this starts with <samp>0x02</samp> which means, it&#8217;s a hash of a signed event.</p>
+<h1 id="rfc.section.4.4.3">
+<a href="#rfc.section.4.4.3">4.4.3.</a> <a href="#transfer-1" id="transfer-1">Transfer</a>
+</h1>
+<p id="rfc.section.4.4.3.p.1">Here is the transfer object for the first event:</p>
+<pre>
+83                                      # array(3)
+   58 57                                # bytes(87)
+      85F6D9041A582101AED3DAB65CE9E0D6C50D46FCEFFB552296ED21B6E
+      0B537A6A0184575CE8F5CBD011A5D3F8880830107D9041A582103E806
+      ECF2B7C37FB06DC198A9B905BE64EE3FDB8237EF80D316ACB7C85BBF5
+      F02
+   58 40                                # bytes(64)
+      91F1B00C37285FC517D4C87FDA951A6BC38AEE7E7DCB8E3CE538289C5
+      CBA0E93A5734BD6853D11FA29DDF0BFE5BC4B5049EF4681CAA1BAA355
+      CD2FFC94191104
+   47                                   # bytes(7)
+      666F6F2E626F78                    # "foo.box"
+</pre>
+<p id="rfc.section.4.4.3.p.2">Similar to the above, we have an array with 3 elements, each in turn being a byte string of varying size.  The first one is the <samp>eventData</samp>, the second one is the <samp>signature</samp> and the last one is the <samp>content</samp> data.  (The long data chunks were broken into multiple lines for readability, consult the code repositories for actual test vectors.)</p>
+<p id="rfc.section.4.4.3.p.3">Here is the transfer object for the second event:</p>
+<pre>
+83                                      # array(3)
+   58 7C                                # bytes(124)
+      85D9041A5821020113F4DD8C981D1D87BC7F46CF86E8E7B0FB774F839
+      930DD38D6A13F69D9693DD9041A582101AED3DAB65CE9E0D6C50D46FC
+      EFFB552296ED21B6E0B537A6A0184575CE8F5CBD021A5D3F888183011
+      6D9041A58210395CCA4FA7B24ABC6049683E716292B00C49509BE147A
+      A024C06286BD9B7DBDA8
+   58 40                                # bytes(64)
+      AFE8658C6F5229951DB4DB82F62E9D930B6CD8F155C5D47586556012E
+      D9C560487C05AAE58A2B66970CBAB666E43890DEB01F33E5281B0F9C7
+      E22F68A437AF09
+   56                                   # bytes(22)
+      7B2269223A312C2274797065223A2274657374227D0A
+
+</pre>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#code-and-roll-out" id="code-and-roll-out">Code and roll out</a>
 </h1>
-<p id="rfc.section.5.p.1">the current work-in-progress repository can be found <a href="http://cryptbox.mindeco.de/ssb/gabbygrove">here</a>.</p>
-<p id="rfc.section.5.p.2">It experiments with Go and javascript interoperability and shows that signature verification and content hashing works as expected.</p>
-<p id="rfc.section.5.p.3">Integration into go-ssb or the javascript stack is pending on review comments.</p>
-<p id="rfc.section.5.p.4">One open question would be how to get this into EBT while also supporting the classical/legacy way of encoding feeds.  For replication of single feeds I&#8217;d suggest using the established stream command <samp>createHistoryStream</samp> which can pick the correct transfer encoding based on the passed feed reference.</p>
+<p id="rfc.section.5.p.1">The current work-in-progress code, licensed under MIT is available for <a href="http://cryptbox.mindeco.de/ssb/gabbygrove">Go</a> and <a href="https://github.com/cryptix/js-gabbygrove">javascript</a> to show interoperability and that signature verification and content hashing works as expected. <a href="https://github.com/cryptoscope/ssb">go-ssb</a> also has integrated in it&#8217;s native sbot, testing against <a href="https://github.com/cryptoscope/ssb/blob/f6960c92e333b219709755a04b03c61500685adb/tests/ggdemo/index.js">a demo plugin</a> for <a href="https://github.com/ssbc/ssb-server">ssb-server</a>.</p>
+<p id="rfc.section.5.p.2">One open question would be how to get this into EBT while also supporting the classical/legacy way of encoding feeds.  For replication of single feeds we can use the established stream command <samp>createHistoryStream</samp> which can pick the correct transfer encoding based on the passed feed reference.</p>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#remarks" id="remarks">Remarks</a>
 </h1>
@@ -698,7 +831,7 @@ A4               # map(4)
 <li>MessgePack: my reading of Appendix E, it&#8217;s quite stable but extension mechanism is in a dead end.</li>
 <li>Protocol Buffers: pretty steep dependency, generated code, schema only interesting for event entries, not higher levels of the stack</li>
 </ul>
-<p><a href="https://tools.ietf.org/html/rfc7049#appendix-E">Appendix E. (Comparison of Other Binary Formats to CBOR&#8217;s Design Objectives)</a> also shows how CBOR compares to ASN.1/DER/BER, BSON and UBJSON.</p>
+<p><a href="https://tools.ietf.org/html/rfc7049#appendix-E">Appendix E of CBORs RFC</a> also shows how CBOR compares to ASN.1/DER/BER, BSON and UBJSON.</p>
 <h1 id="rfc.section.6.2">
 <a href="#rfc.section.6.2">6.2.</a> <a href="#deletion-requests" id="deletion-requests">Deletion requests</a>
 </h1>
@@ -716,9 +849,9 @@ A4               # map(4)
 </h1>
 <p id="rfc.section.7.p.1">Apart from choosing another library for marshalling bytes this proposal changed the name of a couple of things.</p>
 <h1 id="rfc.section.7.1">
-<a href="#rfc.section.7.1">7.1.</a> <a href="#event-1" id="event-1">Event</a>
+<a href="#rfc.section.7.1">7.1.</a> <a href="#event-2" id="event-2">Event</a>
 </h1>
-<p id="rfc.section.7.1.p.1">as <a href="@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519">@cft</a> mentioned in <a href="ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256">his first comment</a>, <em>Message</em> and <em>Meta</em> were not easy to speak and reason about.  &#8220;What includes what?&#8221; wasn&#8217;t easy enough to answer. The <em>Message</em> was conceptually redundant as well since it&#8217;s fields can be in the <em>Transfer</em> structure as well to achieve the same results.  Which is why there is just a single concept for this called <em>Event</em>.</p>
+<p id="rfc.section.7.1.p.1">as <a href="ssb://@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519">@cft</a> mentioned in <a href="ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256">his first comment</a>, <em>Message</em> and <em>Meta</em> were not easy to speak and reason about. &#8220;What includes what?&#8221; wasn&#8217;t easy enough to answer. The <em>Message</em> was conceptually redundant as well since it&#8217;s fields can be in the <samp>transfer</samp> structure as well to achieve the same results. Which is why there is just a single concept for this called <samp>event</samp>.</p>
 <h1 id="rfc.section.7.2">
 <a href="#rfc.section.7.2">7.2.</a> <a href="#content-type" id="content-type">&#8220;Content Type&#8221;</a>
 </h1>
@@ -755,80 +888,14 @@ A4               # map(4)
 <td class="top">
 <a>Bray, T.</a>, "<a href="https://tools.ietf.org/html/rfc8259">The JavaScript Object Notation (JSON) Data Interchange Format</a>", STD 90, RFC 8259, DOI 10.17487/RFC8259, December 2017.</td>
 </tr>
-<tr>
-<td class="reference"><b id="RFC8610">[RFC8610]</b></td>
-<td class="top">
-<a>Birkholz, H.</a>, <a>Vigano, C.</a> and <a>C. Bormann</a>, "<a href="https://tools.ietf.org/html/rfc8610">Concise Data Definition Language (CDDL): A Notational Convention to Express Concise Binary Object Representation (CBOR) and JSON Data Structures</a>", RFC 8610, DOI 10.17487/RFC8610, June 2019.</td>
-</tr>
 </tbody></table>
-<h1 id="rfc.appendix.A">
-<a href="#rfc.appendix.A">Appendix A.</a> <a href="#cddl" id="cddl">CDDL</a>
-</h1>
-<p id="rfc.section.A.p.1">As a suggestion for possible future work, here is the format specification in <em>Concise data definition language (CDDL)</em> <a href="#RFC8610" class="xref">[RFC8610]</a> which describes the <samp>event</samp>, <samp>content</samp> and <samp>transfer</samp> objects.</p>
-<p id="rfc.section.A.p.2">The language allows for more detailed description and definition of valid objects and seems like an interesting tool to define supported types and messages for higher levels of SSB as well.</p>
-<pre>
-; this document uses the Concise data definition language (CDDL)
-; https://tools.ietf.org/html/rfc8610
-
-; it describes the data structures that are used
-; by the gabby grove feed format for secure-scuttlebutt (ssb)
-; feeds are single author/writer and they don't fork.
-; the use of hash functions to address previous entries,
-; turns them into an append-only linked-list that can't be altered.
-
-; a single entry on a feed (formerly also known as message)
-event = [
-  previous: cipherlink,
-  author: cipherlink,
-  sequence: uint,
-  timestamp: uint,
-  content,
-]
-
-content = [
-    hash: cipherlink,
-    size: uint16,
-    encoding: contentEncoding,
-]
-
-; 33 bytes, tagged with major type 6, number 1050
-; this is used to indicate the cryptographic references
-cipherlink = #6.1050(bytes .size 33)
-; See section 2.4 and iana registry for already defined tags
-; https://tools.ietf.org/html/rfc7049#section-2.4
-; https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags
-
-; possible values for content encoding are 0, 1 and 2
-; 0 means _arbitrary bytes_ (like an private message, image or tar)
-; 1 means json
-; 2 means cbor
-contentEncoding = 0..2
-
-; 16-bit unsigned int, equivalent to 0..65536
-uint16 = uint .size 2 
-
-; transfer describes a signed event with the actual content
-transfer = [
-  eventData: bytes,         ; event encoded as bytes
-  signature: signature,     ; the signature 
-  ? contentData: bytes,     ; the actual bytes of the content
-]
-
-; we _could_ define the first field of a transfer as an _event_
-; but I want to make canonical encoding on this level
-; only optional but not a requirement as output
-
-; v1 only support Ed25519 curves.
-; These signatures are always 64 bytes long.
-signature = bytes .size 64
-</pre>
 <h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
 	<span class="vcardline">
 	  <span class="fn">Henry Florenz Bubert</span> 
 	  <span class="n hidden">
-		<span class="family-name">Bubert</span>
+		<span class="family-name">cryptix</span>
 	  </span>
 	</span>
 	<span class="org vcardline">SSBC</span>

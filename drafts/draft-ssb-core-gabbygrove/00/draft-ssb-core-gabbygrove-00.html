@@ -627,7 +627,7 @@
 <a href="#rfc.section.3.4">3.4.</a> <a href="#signing-capability" id="signing-capability">Signing capability</a>
 </h1>
 <p id="rfc.section.3.4.p.1">The existing legacy format has an <a href="https://github.com/ssbc/ssb-keys#signobjkeys-hmac_key-obj">optional HMAC signing capability</a>. When enabled, a hashed message authentication code (<a href="https://en.wikipedia.org/wiki/HMAC">HMAC</a>) is signed instead of the the message (the <samp>event</samp> bytes inside a <samp>transfer</samp> in our case). For this a (usually secret among the users of the network) key is needed. Without this key for the HMAC function, the receiver can&#8217;t validate the signature. Because messages are still communicated as clear text, this mode doesn&#8217;t add any confidentiality, which the needed key might imply. Therefore this mode is primarily usefull for splitting networks of feeds, like for testing purposes.</p>
-<p id="rfc.section.3.4.p.2">Currently this format uses exactly the same scheme as the legacy format for portability reasons.</p>
+<p id="rfc.section.3.4.p.2">Currently this format uses exactly the same scheme as the legacy format for portability reasons. The used HMAC function is NaCLs <samp>crypto_auth</samp>, defined <a href="https://nacl.cr.yp.to/auth.html">here</a>.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#cbor" id="cbor">CBOR</a>
 </h1>

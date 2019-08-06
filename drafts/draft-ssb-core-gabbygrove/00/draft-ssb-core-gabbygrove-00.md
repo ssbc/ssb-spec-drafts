@@ -121,7 +121,7 @@ The author also briefly looked into [IPFS Content Identifiers (CID)s](https://do
 
 The existing legacy format has an [optional HMAC signing capability](https://github.com/ssbc/ssb-keys#signobjkeys-hmac_key-obj). When enabled, a hashed message authentication code ([HMAC](https://en.wikipedia.org/wiki/HMAC)) is signed instead of the the message (the `event` bytes inside a `transfer` in our case). For this a (usually secret among the users of the network) key is needed. Without this key for the HMAC function, the receiver can't validate the signature. Because messages are still communicated as clear text, this mode doesn't add any confidentiality, which the needed key might imply. Therefore this mode is primarily usefull for splitting networks of feeds, like for testing purposes.
 
- Currently this format uses exactly the same scheme as the legacy format for portability reasons.
+ Currently this format uses exactly the same scheme as the legacy format for portability reasons. The used HMAC function is NaCLs `crypto_auth`, defined [here](https://nacl.cr.yp.to/auth.html).
 
 # CBOR
 

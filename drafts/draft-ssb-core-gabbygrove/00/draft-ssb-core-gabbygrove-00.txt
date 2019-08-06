@@ -296,18 +296,19 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    for testing purposes.
 
    Currently this format uses exactly the same scheme as the legacy
-   format for portability reasons.
+   format for portability reasons.  The used HMAC function is NaCLs
+   "crypto_auth", defined here [12].
 
 4.  CBOR
 
 4.1.  Basics
 
    If you never worked with CBOR, I suggest checking out it's website
-   [12] and the definitions in [RFC7049]).  Similar to JSON it is a
+   [13] and the definitions in [RFC7049]).  Similar to JSON it is a
    _self describing_ format.  Which means, bytes of it can be translated
    to logical, typed values without the need for a schema definition.
 
-   The cbor-diag utilities [13] (or the the playground at cbor.me [14]
+   The cbor-diag utilities [14] (or the the playground at cbor.me [15]
    with the same features) can help a lot to see how it works.  With it,
    we can translate between encoded bytes and the diagnostic notation
    (defined in section 6 of CBORs RFC).  Roughly speaking we can use
@@ -323,7 +324,6 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
    which outputs a hexadecimal, indented and commented representation
    with type annotations:
-
 
 
 
@@ -410,7 +410,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    heads of a feed if implementations incorrectly consume them.
 
    However, as an experiment, implementers are advised to use the
-   canonical CBOR suggestions defined in Section 3.9 of CBORs RFC [15].
+   canonical CBOR suggestions defined in Section 3.9 of CBORs RFC [16].
    Since we only use bytes, integers and tags for our structures we can
    ignore the suggestions for map keys and floats.
 
@@ -428,7 +428,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    CBOR allows for augmenting the types of it's values with an
    additional numeric tag.  These are hints for the de- and encoders to
    treat some type of values differently.  See Section 2.4 of CBORs RFC
-   [16] for more.  A list of defined CBOR Tags [17] is maintained by the
+   [17] for more.  A list of defined CBOR Tags [18] is maintained by the
    IANA.
 
    This kind of extensibility through type tags seems useful for SSB,
@@ -437,7 +437,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    took the liberty to take one of the _first come first served_ numbers
    for the cipherlinks above, it's 1050.
 
-   Section 2.4.4.1 of the CBOR RFC [18] also defines tag number 24 to
+   Section 2.4.4.1 of the CBOR RFC [19] also defines tag number 24 to
    delay decoding of embedded cbor values (like the "event" in the
    "transfer").  Depending on how flexible the used CBOR libarary is,
    this might help input validation but since each field of an "event"
@@ -658,10 +658,10 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 5.  Code and roll out
 
    The current work-in-progress code, licensed under MIT is available
-   for Go [19] and javascript [20] to show interoperability and that
+   for Go [20] and javascript [21] to show interoperability and that
    signature verification and content hashing works as expected. go-ssb
-   [21] also has integrated in it's native sbot, testing against a demo
-   plugin [22] for ssb-server [23].
+   [22] also has integrated in it's native sbot, testing against a demo
+   plugin [23] for ssb-server [24].
 
    One open question would be how to get this into EBT while also
    supporting the classical/legacy way of encoding feeds.  For
@@ -696,7 +696,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    o  Protocol Buffers: pretty steep dependency, generated code, schema
       only interesting for event entries, not higher levels of the stack
 
-   Appendix E of CBORs RFC [24] also shows how CBOR compares to
+   Appendix E of CBORs RFC [25] also shows how CBOR compares to
    ASN.1/DER/BER, BSON and UBJSON.
 
 6.2.  Deletion requests
@@ -748,7 +748,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 7.1.  Event
 
-   as @cft [25] mentioned in his first comment [26], _Message_ and
+   as @cft [26] mentioned in his first comment [27], _Message_ and
    _Meta_ were not easy to speak and reason about.  "What includes
    what?" wasn't easy enough to answer.  The _Message_ was conceptually
    redundant as well since it's fields can be in the "transfer"
@@ -765,7 +765,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 8.  Comments addressed since the first "off-chain content" proposal
 
    Remarks this proposal addresses over the first Off-chain content
-   proposal [27]:
+   proposal [28]:
 
 8.1.  incrementing on a broken format
 
@@ -788,7 +788,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 8.2.  The use of MUXRPC specific features for transmission/replication
 
-   The idea to transmit content and metadata as two MUXRPC [28] frames
+   The idea to transmit content and metadata as two MUXRPC [29] frames
    was my idea.  It seems sensible/practical because it fitted into the
    existing stack but I see now that it tried to much to fit into the
    existing way and hid a dependency along the way.
@@ -846,40 +846,42 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
    [11] https://en.wikipedia.org/wiki/HMAC
 
-   [12] https://cbor.io
+   [12] https://nacl.cr.yp.to/auth.html
 
-   [13] https://github.com/cabo/cbor-diag
+   [13] https://cbor.io
 
-   [14] https://cbor.me
+   [14] https://github.com/cabo/cbor-diag
 
-   [15] https://tools.ietf.org/html/rfc7049#section-3.9
+   [15] https://cbor.me
 
-   [16] https://tools.ietf.org/html/rfc7049#section-2.4
+   [16] https://tools.ietf.org/html/rfc7049#section-3.9
 
-   [17] https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags
+   [17] https://tools.ietf.org/html/rfc7049#section-2.4
 
-   [18] https://tools.ietf.org/html/rfc7049#section-2.4.4.1
+   [18] https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml#tags
 
-   [19] http://cryptbox.mindeco.de/ssb/gabbygrove
+   [19] https://tools.ietf.org/html/rfc7049#section-2.4.4.1
 
-   [20] https://github.com/cryptix/js-gabbygrove
+   [20] http://cryptbox.mindeco.de/ssb/gabbygrove
 
-   [21] https://github.com/cryptoscope/ssb
+   [21] https://github.com/cryptix/js-gabbygrove
 
-   [22] https://github.com/cryptoscope/ssb/blob/f6960c92e333b219709755a0
+   [22] https://github.com/cryptoscope/ssb
+
+   [23] https://github.com/cryptoscope/ssb/blob/f6960c92e333b219709755a0
         4b03c61500685adb/tests/ggdemo/index.js
 
-   [23] https://github.com/ssbc/ssb-server
+   [24] https://github.com/ssbc/ssb-server
 
-   [24] https://tools.ietf.org/html/rfc7049#appendix-E
+   [25] https://tools.ietf.org/html/rfc7049#appendix-E
 
-   [25] ssb://@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519
+   [26] ssb://@AiBJDta+4boyh2USNGwIagH/wKjeruTcDX2Aj1r/haM=.ed25519
 
-   [26] ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256
+   [27] ssb://%pXxsQeOENZ/M9vYAlf1+99tqvTY8WtVwSkOEfQddV2o=.sha256
 
-   [27] ssb://%LrMcs9tqgOMLPGv6mN5Z7YYxRQ8qn0JRhVi++OyOvQo=.sha256
+   [28] ssb://%LrMcs9tqgOMLPGv6mN5Z7YYxRQ8qn0JRhVi++OyOvQo=.sha256
 
-   [28] https://github.com/ssbc/muxrpc
+   [29] https://github.com/ssbc/muxrpc
 
 Author's Address
 
@@ -887,8 +889,6 @@ Author's Address
    SSBC
 
    Email: cryptix@riseup.net
-
-
 
 
 

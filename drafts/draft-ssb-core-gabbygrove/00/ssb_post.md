@@ -1,5 +1,24 @@
 # GabbyGrove (CBOR based feed format)
 
+# Proposal
+
+Here is the PR on the ssb-specs-draft repo. Here is the proposal as a [type:blog]().
+
+
+# Food for thought
+
+During reasearch and discussions with friends there were a few things that didn't get integrated into this proposal:
+
+## Replication scope
+
+Among other things, @keks and I discussed the _signing capabilities_. We both disliked that it is _optional_ in the old format.
+
+Keks proposed to always use this mode but use a key just made up of zero bytes by default. He also gave the feature a different name: _replication scope_, which reflects much more of what it actually enables. It seperates feeds by this setting (and the used key) since they are invalid in other settings.
+
+He also proposed to just store the used key as a field on the event (maybe called `scope`). Since the value doesn't have to be secret, you wouldn't even need to hash any of the event bytess to achive the same effect. If it should be secret, for whatever reason, the `scope` field could store `hmac(content.hash, scopeKey)`.
+
+I liked this more explicit way of defining it but disliked the additonal bytes this would take up (both from a minimalist and a processing size perspective) and wondered if this doesn't achive the same effect: Change `previous` and `content.hash` to an HMAC function instead of a plain hash and use `scopeKey` as their key. The only remaining problem is that the first message would process `hmac(null, scopeKey)` which would be ambigous. To fix this, we could store `hash(scopeKey)` on the first `previous` value instead of `null`.
+
 ## CDDL
 
 As a suggestion for possible future work, here is the format specification in _Concise data definition language (CDDL)_ {{?RFC8610}} which describes the `event`, `content` and `transfer` objects.

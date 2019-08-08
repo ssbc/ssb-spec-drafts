@@ -207,6 +207,21 @@ Showing the user something they don't want to see can be serious (emotionally pa
 
 Locally standardized tags will probably emerge in various communities.  Clients MAY autocomplete the content warning field with common words and hashtags observed in other content warning fields, to facilitate this convergence.  But clients MUST also allow free text entry so authors can describe the subtlety of their content.
 
+**- Why a new JSON field instead of embedding the warning inside the post text?**
+
+For example, Livejournal used a special HTML tag `<lj-cut>spiders</lj-cut>`.  Reddit has its own syntax for spoilers, `>!spiders!<`.
+
+Pros of that approach:
+* Users can hide only certain parts of a post
+* Probably visible in legacy clients which don't interpret the new markup
+
+Cons:
+* Adds more complexity to our already-customized Markdown parser, making it harder to implement SSB in new languages
+* Users have to learn more markup instead of just typing into an additional field
+* Users have to think more about which parts of their post to hide
+
+Instead, the proposed approach is simpler to implement and simpler to use, though not quite as expressive.
+
 **- How do I know what kind of content to tag?**
 
 This is a social convention that emerges in conversations within a community.  Notice what topics other people are CW'ing.  Listen to your peers and act with care towards their experiences. 

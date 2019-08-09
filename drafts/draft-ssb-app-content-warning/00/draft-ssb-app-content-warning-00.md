@@ -2,6 +2,12 @@
 
 *v00.  2019-08-08*
 
+## At a glance
+
+![json-diagram](cw-json.png)
+![writing-diagram](cw-writing.png)
+![reading-diagram](cw-reading.png)
+
 ## Why
 
 People often want to avoid some topics in a conversation.

@@ -68,7 +68,7 @@ It contains a fixed number of fields:
 * A cipherlink to the `previous` one, null only on the first entry.
 * The ed25519 public key of the `author`, also encoded as a cipherlink.
 * The `sequence` number of the entry as an unsigned integer. Increasing by 1 each entry, starting with 1.
-* An unsigned integer describing a `timestamp`. UNIX epoch timestamp (number of seconds since 1970-01-01).
+* An signed integer describing a `timestamp`. UNIX epoch timestamp (number of seconds since 1970-01-01). Using signed integers to allow use for historic data.
 * `content`: an array of three fields:
   * `hash` as a cipherlink
   * `size` as a uint16, increasing the maximum content size to 64k.

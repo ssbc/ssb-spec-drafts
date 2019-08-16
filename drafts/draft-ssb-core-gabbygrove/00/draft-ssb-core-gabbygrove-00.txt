@@ -4,8 +4,8 @@
 
 Secure Scuttlebutt Working Group                               . cryptix
 SSB-Draft                                                           SSBC
-Intended status: Informational                           August 06, 2019
-Expires: February 7, 2020
+Intended status: Informational                           August 16, 2019
+Expires: February 17, 2020
 
 
                   GabbyGrove (CBOR-based Feed Format)
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use SSB-Drafts as reference material or
    to cite them other than as "work in progress."
 
-   This SSB-Draft will expire on February 7, 2020.
+   This SSB-Draft will expire on February 17, 2020.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Table of Contents
 
 
 
-cryptix                 Expires February 7, 2020                [Page 1]
+cryptix                 Expires February 17, 2020               [Page 1]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -109,7 +109,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 2]
+cryptix                 Expires February 17, 2020               [Page 2]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -165,7 +165,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 3]
+cryptix                 Expires February 17, 2020               [Page 3]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -173,8 +173,9 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
    o  The "sequence" number of the entry as an unsigned integer.
       Increasing by 1 each entry, starting with 1.
 
-   o  An unsigned integer describing a "timestamp".  UNIX epoch
-      timestamp (number of seconds since 1970-01-01).
+   o  An signed integer describing a "timestamp".  UNIX epoch timestamp
+      (number of seconds since 1970-01-01).  Using signed integers to
+      allow use for historic data.
 
    o  "content": an array of three fields:
 
@@ -220,8 +221,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-
-cryptix                 Expires February 7, 2020                [Page 4]
+cryptix                 Expires February 17, 2020               [Page 4]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -277,7 +277,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 5]
+cryptix                 Expires February 17, 2020               [Page 5]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -333,7 +333,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 6]
+cryptix                 Expires February 17, 2020               [Page 6]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -389,7 +389,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 7]
+cryptix                 Expires February 17, 2020               [Page 7]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -445,7 +445,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 8]
+cryptix                 Expires February 17, 2020               [Page 8]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -501,7 +501,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020                [Page 9]
+cryptix                 Expires February 17, 2020               [Page 9]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -557,7 +557,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 10]
+cryptix                 Expires February 17, 2020              [Page 10]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -613,7 +613,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 11]
+cryptix                 Expires February 17, 2020              [Page 11]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -669,7 +669,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 12]
+cryptix                 Expires February 17, 2020              [Page 12]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -725,7 +725,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 13]
+cryptix                 Expires February 17, 2020              [Page 13]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -781,7 +781,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 14]
+cryptix                 Expires February 17, 2020              [Page 14]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -837,7 +837,7 @@ SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
 
 
-cryptix                 Expires February 7, 2020               [Page 15]
+cryptix                 Expires February 17, 2020              [Page 15]
 
 SSB-Draft                   DRAFT GabbyGrove                 August 2019
 
@@ -893,4 +893,4 @@ Author's Address
 
 
 
-cryptix                 Expires February 7, 2020               [Page 16]
+cryptix                 Expires February 17, 2020              [Page 16]

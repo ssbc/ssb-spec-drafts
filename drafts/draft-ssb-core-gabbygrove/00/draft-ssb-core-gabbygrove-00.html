@@ -414,7 +414,7 @@
 
   <meta name="dct.creator" content="cryptix, ." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ssb-core-gabbygrove-00" />
-  <meta name="dct.issued" scheme="ISO8601" content="2019-08-06" />
+  <meta name="dct.issued" scheme="ISO8601" content="2019-08-16" />
   <meta name="dct.abstract" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: Be easier to implement compared to the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, the feed entry only references content by hash to enable content deletion without breaking verification of the feed." />
   <meta name="description" content="This document defines a new binary format for append-only feeds as used by Secure-Scuttlebutt.  That is, it defines the bytes that are used for computing the cryptographic signatures and hashes that make up a feed in this format.  It strives to do two things: Be easier to implement compared to the current scheme. Hence, it uses CBOR  to encode the logical values that describe each entry.  Secondly, the feed entry only references content by hash to enable content deletion without breaking verification of the feed." />
 
@@ -435,10 +435,10 @@
 </tr>
 <tr>
 <td class="left">Intended status: Informational</td>
-<td class="right">August 06, 2019</td>
+<td class="right">August 16, 2019</td>
 </tr>
 <tr>
-<td class="left">Expires: February 7, 2020</td>
+<td class="left">Expires: February 17, 2020</td>
 <td class="right"></td>
 </tr>
 
@@ -454,7 +454,7 @@
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>SSB-Drafts are working documents of the Secure Scuttlebutt community.  Note that other groups may also distribute working documents as SSB-Drafts.</p>
 <p>SSB-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use SSB-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This SSB-Draft will expire on February 7, 2020.</p>
+<p>This SSB-Draft will expire on February 17, 2020.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2019 SSB Council and the persons identified as the document authors.  All rights reserved.</p>
 
@@ -568,7 +568,7 @@
 <li>A cipherlink to the <samp>previous</samp> one, null only on the first entry.</li>
 <li>The ed25519 public key of the <samp>author</samp>, also encoded as a cipherlink.</li>
 <li>The <samp>sequence</samp> number of the entry as an unsigned integer. Increasing by 1 each entry, starting with 1.</li>
-<li>An unsigned integer describing a <samp>timestamp</samp>. UNIX epoch timestamp (number of seconds since 1970-01-01).</li>
+<li>An signed integer describing a <samp>timestamp</samp>. UNIX epoch timestamp (number of seconds since 1970-01-01). Using signed integers to allow use for historic data.</li>
 <li>
 <samp>content</samp>: an array of three fields: <ul>
 <li>

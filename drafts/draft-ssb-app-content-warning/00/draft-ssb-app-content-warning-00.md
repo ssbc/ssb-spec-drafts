@@ -48,97 +48,33 @@ A short survey of Mastodon posts showed these content warnings (paraphrased).  T
 * content that only some readers care about, like local events in a city
 * identify this spider for me
 
-## Author experience
+On SSB perhaps people will #hashtag the important words to make auto-filtering easier.
 
-When authoring a supported message type (see below), clients SHOULD provide a "content warning" field for the author to enter an arbitrary string.  This field SHOULD be a single line, disallowing newlines, with a maximum length of 512 bytes (when encoded in UTF-8).
+## Ideas for user preferences
 
-The client SHOULD place this field after the main body field, next to the Post button.  This reminds the author to consider the field before posting.
+* Auto-expand or auto-collapse...
+  * all CWs
+  * CWs from these users: ___
+  * CWs with these words or hashtags: ___
 
-The content warning field is assumed to contain a subset of Markdown (see below).  Clients MAY autocomplete channel names/hashtags, emoji shortcodes, and @username mentions in this field.
+* Download images in CW posts...
+  * in advance
+  * when post is expanded
+  * when image is clicked
 
-## Reader experience
-
-At a bare minimum, clients MUST show content warnings above messages, even if they are not interactive.
-
-When the reader first encounters a post with a CW (content warning), it SHOULD be collapsed by default unless the user has changed the client settings.
-
-A collapsed message shows the text of the content warning instead of the main body of the message.  It still shows the author, time, number of likes, etc.  It MUST NOT show any images.
-
-Clicking the CW toggles the display of the main body, below the CW.  The CW MUST remain visible.  It MUST be possible to re-collapse the message after expanding it, because the user may change their mind after seeing the content.
-
-The CW MUST be rendered in a way that is distinct from regular body text so the user knows what it is.  This could be an icon next to the text such as a disclosure triangle, a different color or font weight, or some other typographical convention such as putting it in brackets.
-
-Since the CW can contain links, there MUST be a place to click outside of the CW text which will expand/collapse the post, such as the border space around the CW text, without hitting the links.
-
-Clients MAY take readers to a new page to read an expanded post instead of expanding it inline, but this is discouraged as it disrupts the reading flow.
-
-### Parsing and rendering of the CW text itself
-
-If the CW text is longer than usual (approximately 512 bytes), it SHOULD be truncated and the user SHOULD be able to expand the CW itself to see the entire CW text, before expanding the body of the message.
-
-The client MAY treat the CW as either plain text or a subset of Markdown.  The intent of this specification is to render the CW as a single line of rich text.
-
-Allowed Markdown features:
-* links
-* literal emoji characters
-* emoji shortcodes
-* @mentions
-* #hashtags / channels
-* bold, italic
-
-Images MUST NOT be shown in the CW message itself.
-
-Markdown features related to layout and font size MUST instead be rendered as part of the single line of text:
-* newlines -- omit them
-* headers -- show as bold, regular size text
-* tables
-* horizontal rules
-
-The client MAY automatically linkify links in the CW text such as @mentions, #hashtags, ssb message links, blob links, and URLs.
-
-The [ssb-markdown](https://github.com/ssbc/ssb-markdown) library has a function `md.inline(source, opts)` which renders markdown to a single line of output.  TODO: is this suitable?  Does it render images?
-
-### User preferences
-
-Clients SHOULD default messages to a collapsed state unless the user has changed settings.
-
-Clients SHOULD allow users to automatically expand all CW'd posts.
-
-Clients SHOULD NOT allow users to ever hide the CW text itself, as this provides important social context and meaning for the message.
-
-Clients MAY remember the expanded/collapsed state of each individual message.
-
-Clients could have a variety of settings about the behavior of CW'd messages, such as:
-* Automatically start CW'd messages as: expanded / collapsed
-* Auto-expand or collapse messages with the following words in their CW: _____
-* Auto-expand or collapse CW messages from the following people: _____
-
-Clients MAY offer these settings in a menu embedded within each CW, such as "always expand posts from this author".
-
-Unless the user clearly indicates otherwise, these settings MUST NOT be stored as public messages in the user's feed -- all of these settings, and the user's expand/collapse actions, MUST be private and will likely stored locally outside of the user's feed.
-
-Clients MAY allow users to share their CW viewing settings, blocklists, and allowlists.  This could happen by publishing public messages, subscribing to other users' settings, or allowing the user to import and export settings manually (for example, as JSON).  The user MUST be clearly informed before public sharing occurs so it does not happen by accident.  Details of this sharing out out of scope for this document.
-
-### Images within CW posts
+* Blur images in CW posts
 
 Users may wish to only download images from inside CW'd posts on demand, when they choose to expand the post.  This could be for legal, moral, or contextual reasons (e.g. the user is on a work computer).
 
-Users may also wish to pre-fetch images in bulk so that they can go offline.  This conflicts with the previous wish.  Clients MAY offer settings to configure this behavior in detail.
+Users may also wish to pre-fetch images in bulk so that they can go offline.  This conflicts with the previous wish.
 
-Clients SHOULD default to the "safer" behavior of only downloading images when the post is expanded.
+## Privacy
 
-Recommended client settings:
+Unless the user clearly indicates otherwise, their settings should not be stored as public messages in the user's feed.
 
-> Downloading images in content-warning'd posts:
-> * download when each post is expanded
-> * download in advance (good for offline situations)
-> 
-> Viewing images in content-warning'd posts:
-> * show immediately
-> * blur until clicked
-> * don't download at all until clicked
+Clients could allow users to export their settings, blocklists, and allowlists and share them with others.
 
-### Accessibility
+## Accessibility
 
 CWs add work to the process of reading because readers have to manually expand posts.  This amount of work may be an accessibility barrier.
 
@@ -160,11 +96,13 @@ The content warning is a string in an optional JSON field, `contentWarning`.
       "content": {
         "type": "post",
 
-        "contentWarning": "horrible spiders",
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "contentWarning": "identify these #spiders",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         "text": "Can anyone help me identify these spiders? ![spider-party.jpg](&ssss.sha256)",
-        "mentions": []
+        "mentions": [
+          { "link": "#spiders" }
+        ]
       },
       "signature": "zzzz.sig.ed25519"
     },
@@ -172,24 +110,9 @@ The content warning is a string in an optional JSON field, `contentWarning`.
   },
 ```
 
-When authoring a message, clients MUST omit the field if they intend there to be no content warning.
-
-When reading a message, clients MUST interpret these cases to mean there is NO content warning: the field is omitted, `null`, an empty string, or something other than a string.
-
-Clients MUST support content warnings on these message types:
-* `post`
-* `gathering`
-* `blog`
-
-Clients SHOULD show content warnings even if they do not yet provide a way to author them.
-
-Future message types which contain substantial content SHOULD also support content warnings.
-
-Both public and private messages MUST support content warnings.
-
 ## Future directions
 
-We could use [Blurhash](https://blurha.sh) which converts images to very low resolution thumbnails stored as short text strings.  This would allow showing blurry images before downloading the actual image.  Mastodon does this; see [their blog post](https://blog.joinmastodon.org/2019/05/improving-support-for-adult-content-on-mastodon/).  It's not immediately obvious where to put these strings in a message's JSON object; or do they belong in a lower level of the stack, where blobs are handled?
+We could use [Blurhash](https://blurha.sh) which converts images to very low resolution thumbnails stored as short text strings.  This would allow showing blurry images before downloading the actual image.  Mastodon does this; see [their blog post](https://blog.joinmastodon.org/2019/05/improving-support-for-adult-content-on-mastodon/).
 
 We could let people place content warnings on other people's posts, but that's outside the scope of this document.  Care is required to avoid creating new vectors for abuse.
 
@@ -201,7 +124,7 @@ You can use the [details](https://developer.mozilla.org/en-US/docs/Web/HTML/Elem
 
 **- When a CW'd post has comments, should the entire thread be collapsed or only the first post?**
 
-We don't know yet.  Let's see how people use this.
+If the user doesn't want to read the post, they probably don't want to read the comments?
 
 **- Why not use standardized or structured tags?**
 
@@ -211,7 +134,9 @@ The rich diversity of use-cases for content warnings, and the way they vary from
 
 Showing the user something they don't want to see can be serious (emotionally painful, illegal, etc).  Without global standards, an automated show-or-hide feature will frequently fail and show users things they don't want to see, so it can't be relied on.  For that reason we default to hiding all posts and let the user decide about each one.
 
-Locally standardized tags will probably emerge in various communities.  Clients MAY autocomplete the content warning field with common words and hashtags observed in other content warning fields, to facilitate this convergence.  But clients MUST also allow free text entry so authors can describe the subtlety of their content.
+Locally standardized words will probably emerge in various communities.  Clients can autocomplete the content warning field with common words and hashtags observed in other content warning fields, to facilitate this convergence.
+
+The primary goal, though, is human readbility.  People may want to auto-expand some words, but which content they feel like reading will vary from day to day according to their mood and emotional resources.
 
 **- Why a new JSON field instead of embedding the warning inside the post text?**
 

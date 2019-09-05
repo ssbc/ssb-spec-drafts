@@ -19,6 +19,10 @@
 
 ## Protocol/Core layer
 
+- draft-ssb-core-gabbygrove:
+  [html](https://htmlpreview.github.com/?https://github.com/ssbc/ssb-spec-drafts/blob/master/drafts/draft-ssb-core-gabbygrove/00/draft-ssb-core-gabbygrove-00.html),
+  [txt](draft-ssb-core-gabbygrove/00/draft-ssb-core-gabbygrove-00.txt)
+
 ---
 
 ## Replication layer

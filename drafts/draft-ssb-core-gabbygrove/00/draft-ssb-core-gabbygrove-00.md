@@ -242,15 +242,15 @@ These are the first two messages of a feed authored by the keypair above.
  6:         AED3DAB65CE9E0D6C50D46FCEFFB5522
  7:         96ED21B6E0B537A6A0184575CE8F5CBD
  8:   01                                   # unsigned(1)
- 9:   1A 5D3F8880                          # unsigned(1564444800)
+ 9:   24                                   # negative(4)
 10:   83                                   # array(3)
-11:      01                                # unsigned(1)
-12:      07                                # unsigned(7)
-13:      D9 041A                           # tag(1050)
-14:         58 21                          # bytes(33)
-15:            03
-16:            E806ECF2B7C37FB06DC198A9B905BE64
-17:            EE3FDB8237EF80D316ACB7C85BBF5F02
+11:      D9 041A                           # tag(1050)
+12:         58 21                          # bytes(33)
+13:            03
+14:            A7AC59B52AFF894BA89508B35F445AE9
+15:            0628F6D5F358157E4F45F39B5B3BE96B
+16:      09                                # unsigned(9)
+17:      00                                # unsigned(0)
 ~~~~~~~~~~~
 
 Let's discuss line by line what this means:
@@ -263,14 +263,13 @@ Let's discuss line by line what this means:
 6. This is the first half of the authors public key, broken in two lines of 16bytes each. (This is only to conform with the 72 character limit of text only output of this document.)
 7. This is the 2nd half of the authors public key.
 8. The next line is the third element of the array: the `sequence` number encoded as an unsigned integer, as the comment tells us.
-9. The fourth element is the `timestamp` also encoded as an unsigned integer. As a starting timestamp I picked 2019-07-30, which translates to 1564444800 seconds as a Unix epoch timestamp.
-10. The fifth element is the `content` object, which itself is encoded as an array of 3 items (`encoding`, `size` and `hash`)
-11. The number 1 means the content was encoded as `json` (See Section 2.3).
-12. This is the content's `size`, in bytes also as an unsigned integer. Meaning, this content is 7 bytes long.
-13. Finally, we have a cipherlink again.
-14. It's 33 bytes long
-15. It starts with 03 which means, it's a content hash. (See Section 3.3)
-16. The following two lines are the hash function output. Where this comes from will be shown in the next section.
+9. The fourth element is the `timestamp` encoded as an signed integer. As a starting timestamp I picked 1969-12-31 23:59:55, which translates to -5 seconds as a UNIX epoch timestamp.
+10. The fifth element is the `content` object, which itself is encoded as an array of 3 items (`hash`, `size` and `encoding`)
+11. First, we have a cipherlink for the `hash`.
+13. It starts with 03 which means, it's a content hash. (See Section 3.3)
+14. The following two lines are the hash function output. How to compute these will be shown in the next section.
+16. This is the content's `size`, in bytes also as an unsigned integer. Meaning, this content is 9 bytes long.
+17. The number 0 means the content was encoded as `binary` (See Section 2.3).
 
 Here is the next message:
 
@@ -279,27 +278,29 @@ Here is the next message:
    D9 041A                              # tag(1050)
       58 21                             # bytes(33)
          02
-         0113F4DD8C981D1D87BC7F46CF86E8E7
-         B0FB774F839930DD38D6A13F69D9693D
+         CCD8FD8392C1B9D1E3026DEA42BEC93E
+         04B6F8ECEB9AF2D591489EB8B831C5E1
    D9 041A                              # tag(1050)
       58 21                             # bytes(33)
          01
          AED3DAB65CE9E0D6C50D46FCEFFB5522
          96ED21B6E0B537A6A0184575CE8F5CBD
    02                                   # unsigned(2)
-   1A 5D3F8881                          # unsigned(1564444801)
+   23                                   # negative(3)
    83                                   # array(3)
-      01                                # unsigned(1)
-      16                                # unsigned(22)
       D9 041A                           # tag(1050)
          58 21                          # bytes(33)
             03
             95CCA4FA7B24ABC6049683E716292B00
             C49509BE147AA024C06286BD9B7DBDA8
+      16                                # unsigned(22)
+      01                                # unsigned(1)
 
 ~~~~~~~~~~~
 
-If you compare this to the above you should see some similarities. Instead of `0xf6` as the first element as the array we now have `0xD0491A5821`. We have seen this sequence twice above already: It's a cipherlink with 33 bytes of data. Instead of starting with byte `0x01` or `0x03`, this starts with `0x02` which means, it's a hash of a signed event.
+If you compare this to the above you should see some similarities. Instead of `0xf6` as the first element as the array we now have `0xD9041A5821`. We have seen this sequence of bytes twice above already: It's a cipherlink with 33 bytes of data. Instead of starting with byte `0x01` or `0x03`, this starts with `0x02` which means, it's a hash of a signed event.
+
+The content type is `0x01` instead and the timestamp is advanced by 1 as well as the `sequence`.
 
 ### Transfer
 
@@ -307,17 +308,16 @@ Here is the transfer object for the first event:
 
 ~~~~~~~~~~~
 83                                      # array(3)
-   58 57                                # bytes(87)
+   58 53                                # bytes(83)
       85F6D9041A582101AED3DAB65CE9E0D6C50D46FCEFFB552296ED21B6E
-      0B537A6A0184575CE8F5CBD011A5D3F8880830107D9041A582103E806
-      ECF2B7C37FB06DC198A9B905BE64EE3FDB8237EF80D316ACB7C85BBF5
-      F02
+      0B537A6A0184575CE8F5CBD012483D9041A582103A7AC59B52AFF894B
+      A89508B35F445AE90628F6D5F358157E4F45F39B5B3BE96B0900
    58 40                                # bytes(64)
-      91F1B00C37285FC517D4C87FDA951A6BC38AEE7E7DCB8E3CE538289C5
-      CBA0E93A5734BD6853D11FA29DDF0BFE5BC4B5049EF4681CAA1BAA355
-      CD2FFC94191104
-   47                                   # bytes(7)
-      666F6F2E626F78                    # "foo.box"
+      8A3739FDB99D91E28552E9A2E22650C14A8CDBFE607CDCA5767569DB2
+      B1E24CAA3C31D65964143DC752E568B05C99E0E97C198885BFB8F3549
+      B9C6CCBC991205
+   49                                   # bytes(9)
+      FF7330316D4279747A                # "\xFFs01mBytz"
 ~~~~~~~~~~~
 
 Similar to the above, we have an array with 3 elements, each in turn being a byte string of varying size.
@@ -329,21 +329,19 @@ Here is the transfer object for the second event:
 
 ~~~~~~~~~~~
 83                                      # array(3)
-   58 7C                                # bytes(124)
-      85D9041A5821020113F4DD8C981D1D87BC7F46CF86E8E7B0FB774F839
-      930DD38D6A13F69D9693DD9041A582101AED3DAB65CE9E0D6C50D46FC
-      EFFB552296ED21B6E0B537A6A0184575CE8F5CBD021A5D3F888183011
-      6D9041A58210395CCA4FA7B24ABC6049683E716292B00C49509BE147A
-      A024C06286BD9B7DBDA8
+   58 78                                # bytes(120)
+      85D9041A582102CCD8FD8392C1B9D1E3026DEA42BEC93E04B6F8ECEB9
+      AF2D591489EB8B831C5E1D9041A582101AED3DAB65CE9E0D6C50D46FC
+      EFFB552296ED21B6E0B537A6A0184575CE8F5CBD022383D9041A58210
+      395CCA4FA7B24ABC6049683E716292B00C49509BE147AA024C06286BD
+      9B7DBDA81601
    58 40                                # bytes(64)
-      AFE8658C6F5229951DB4DB82F62E9D930B6CD8F155C5D47586556012E
-      D9C560487C05AAE58A2B66970CBAB666E43890DEB01F33E5281B0F9C7
-      E22F68A437AF09
+      3A7F29F7395CC454C3904DE2236EEF2C0147496B77C556ADE1A08BF57
+      D3E70D2A43A4C723AEB5366D4F073CEEB8B2677E03EC62E49D1647C67
+      0D95CC77F9DB07
    56                                   # bytes(22)
       7B2269223A312C2274797065223A2274657374227D0A
-
 ~~~~~~~~~~~
-
 
 # Code and roll out
 

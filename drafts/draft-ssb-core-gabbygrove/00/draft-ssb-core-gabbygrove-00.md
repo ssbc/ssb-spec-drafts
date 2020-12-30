@@ -345,7 +345,7 @@ Here is the transfer object for the second event:
 
 # Code and roll out
 
-The current work-in-progress code, licensed under MIT is available for [Go](http://cryptbox.mindeco.de/ssb/gabbygrove) and [javascript](https://github.com/cryptix/js-gabbygrove) to show interoperability and that signature verification and content hashing works as expected. [go-ssb](https://github.com/cryptoscope/ssb) also has integrated in it's native sbot, testing against [a demo plugin](https://github.com/cryptoscope/ssb/blob/f6960c92e333b219709755a04b03c61500685adb/tests/ggdemo/index.js) for [ssb-server](https://github.com/ssbc/ssb-server). 
+The current work-in-progress code, licensed under MIT is available for [Go](http://git.mindeco.de/ssb/gabbygrove) and [javascript](https://github.com/cryptix/js-gabbygrove) to show interoperability and that signature verification and content hashing works as expected. [go-ssb](https://github.com/cryptoscope/ssb) also has integrated in it's native sbot, testing against [a demo plugin](https://github.com/cryptoscope/ssb/blob/f6960c92e333b219709755a04b03c61500685adb/tests/ggdemo/index.js) for [ssb-server](https://github.com/ssbc/ssb-server). 
 
 One open question would be how to get this into EBT while also supporting the classical/legacy way of encoding feeds.
 For replication of single feeds we can use the established stream command `createHistoryStream` which can pick the correct transfer encoding based on the passed feed reference.

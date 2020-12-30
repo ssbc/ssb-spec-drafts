@@ -854,7 +854,7 @@ SSB-Draft                   DRAFT GabbyGrove              September 2019
 
    [19] https://tools.ietf.org/html/rfc7049#section-2.4.4.1
 
-   [20] http://cryptbox.mindeco.de/ssb/gabbygrove
+   [20] http://git.mindeco.de/ssb/gabbygrove
 
    [21] https://github.com/cryptix/js-gabbygrove
 
